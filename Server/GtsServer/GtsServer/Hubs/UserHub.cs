@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,8 +19,7 @@ namespace LoneLabWebApp.Services.Hubs
         {
             _players.Add(userName, new Player
             {
-                Name = userName,
-                Color = GetRandomColor()
+                Name = userName
             });
             await SendUserList(_players);
         }
@@ -29,31 +27,24 @@ namespace LoneLabWebApp.Services.Hubs
         public async Task RemoveUserName(string userName)
         {
             _players.Remove(userName);
-            await SendUserList(_players);
+            await RemoveUser(userName);
         }
 
-        public async Task SetCoordinate(string userName, int x, int y)
+        public async Task SetCoordinate(string userName, int x, int z)
         {
             _players[userName].X = x;
-            _players[userName].Y = y;
+            _players[userName].Z = z;
             await SendUserList(_players);
         }
 
-        public async Task SendUserList(Dictionary<string, Player> userNames)
+        public async Task SendUserList(Dictionary<string, Player> players)
         {
-            await Clients?.All.SendAsync("ReceiveUserList", userNames);
+            await Clients?.All.SendAsync("ReceiveUserList", players);
         }
 
-        private string GetRandomColor()
+        public async Task RemoveUser(string playerName)
         {
-            var rand = new Random();
-            var letters = "0123456789ABCDEF".ToCharArray();
-            var color = new StringBuilder("#");
-            for (var i = 0; i < 6; i++)
-            {
-                color.Append(letters[rand.Next(0, 15)]);
-            }
-            return color.ToString();
+            await Clients?.All.SendAsync("RemoveUser", playerName);
         }
     }
 }
