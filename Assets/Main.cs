@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using Assets.Models;
+using Microsoft.AspNetCore.SignalR.Client;
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class Main : MonoBehaviour
@@ -20,6 +24,10 @@ public class Main : MonoBehaviour
 
     private string userName = "";
 
+    private HubConnection connection;
+
+    private HashSet<string> scenePlayers = new HashSet<string>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +44,13 @@ public class Main : MonoBehaviour
         errorButton.onClick.AddListener(OnErrorClick);
         errorText.enabled = false;
         errorButtonObject.SetActive(false);
+
+        connection = new HubConnectionBuilder()
+            .WithUrl("http://localhost:5000/userHub")
+            .Build();
+        connection.StartAsync();
+        connection.On<Dictionary<string, Player>> ("ReceiveUserList", x => ReceiveUserList(x));
+        connection.On<string> ("RemoveUser", x => RemoveUser(x));
     }
 
     void Update()
@@ -53,6 +68,7 @@ public class Main : MonoBehaviour
                 {
                     player.transform.Translate(-movementSpeed, 0, 0);
                 }
+                connection.InvokeAsync("SetCoordinate", userName, player.transform.position.x, player.transform.position.z);
             }
             if (Input.GetButtonDown("Vertical"))
             {
@@ -65,8 +81,15 @@ public class Main : MonoBehaviour
                 {
                     player.transform.Translate(0, 0, -movementSpeed);
                 }
+                connection.InvokeAsync("SetCoordinate", userName, player.transform.position.x, player.transform.position.z);
             }
         }
+    }
+
+    void OnDestroy()
+    {
+        connection.InvokeAsync("RemoveUserName", userName);
+        connection.StopAsync();
     }
 
     void OnLoginClick()
@@ -84,8 +107,12 @@ public class Main : MonoBehaviour
         {
             player = GameObject.CreatePrimitive(PrimitiveType.Cube);
             player.transform.position = new Vector3(20, 1, 20);
+            var playerRenderer = player.GetComponent<Renderer>();
+            playerRenderer.material.SetColor("_Color", Random.ColorHSV());
+
             loginButtonObject.SetActive(false);
             nameFieldObject.SetActive(false);
+            connection.InvokeAsync("AddUserName", userName);
         }
     }
 
@@ -95,5 +122,37 @@ public class Main : MonoBehaviour
         nameFieldObject.SetActive(true);
         errorText.enabled = false;
         errorButtonObject.SetActive(false);
+    }
+
+    void ReceiveUserList(Dictionary<string, Player> players)
+    {
+        foreach (var player in players)
+        {
+            if (player.Key == userName)
+            {
+                continue;
+            }
+            else if (!scenePlayers.Contains(player.Key))
+            {
+                scenePlayers.Add(player.Key);
+                var newPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                newPlayer.transform.position = new Vector3(player.Value.X, 1, player.Value.Z);
+                newPlayer.name = player.Key;
+                var newPlayerRenderer = newPlayer.GetComponent<Renderer>();
+                newPlayerRenderer.material.SetColor("_Color", Random.ColorHSV());
+            }
+            else 
+            {
+                var oldPlayer = GameObject.Find(player.Key);
+                oldPlayer.transform.position = new Vector3(player.Value.X, 1, player.Value.Z);
+            }
+        }
+    }
+
+    void RemoveUser(string name)
+    {
+        var player = GameObject.Find(name);
+        scenePlayers.Remove(name);
+        player.SetActive(false);
     }
 }
