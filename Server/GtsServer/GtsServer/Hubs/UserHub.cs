@@ -30,42 +30,6 @@ namespace LoneLabWebApp.Services.Hubs
             await RemoveUser(userName);
         }
 
-        public async Task SetMovingForwardStatus(string userName, bool isMovingForward)
-        {
-            if (_players.ContainsKey(userName))
-            {
-                _players[userName].IsMovingForward = isMovingForward;
-                await SendUser(_players[userName]);
-            }
-        }        
-        
-        public async Task SetMovingBackStatus(string userName, bool isMovingBack)
-        {
-            if (_players.ContainsKey(userName))
-            {
-                _players[userName].IsMovingBack = isMovingBack;
-                await SendUser(_players[userName]);
-            }
-        }        
-        
-        public async Task SetMovingLeftStatus(string userName, bool isMovingLeft)
-        {
-            if (_players.ContainsKey(userName))
-            {
-                _players[userName].IsMovingLeft = isMovingLeft;
-                await SendUser(_players[userName]);
-            }
-        }        
-        
-        public async Task SetMovingRightStatus(string userName, bool isMovingRight)
-        {
-            if (_players.ContainsKey(userName))
-            {
-                _players[userName].IsMovingRight = isMovingRight;
-                await SendUser(_players[userName]);
-            }
-        }
-
         public async Task Synchronize(Player player)
         {
             if (_players.ContainsKey(player.Name))
