@@ -20,7 +20,9 @@ public class Main : MonoBehaviour
     private GameObject nameFieldObject;
     private InputField nameField;
 
-    private float movementSpeed = 1;
+    private float movementSpeed = 2;
+    private float timeModifier = 0.02f;
+    private float step;
 
     private string userName = "";
 
@@ -51,37 +53,91 @@ public class Main : MonoBehaviour
         connection.StartAsync();
         connection.On<Dictionary<string, Player>> ("ReceiveUserList", x => ReceiveUserList(x));
         connection.On<string> ("RemoveUser", x => RemoveUser(x));
+        step = movementSpeed * timeModifier;
     }
 
     void Update()
     {
         if (player != null)
         {
+            if (Input.GetButton("Horizontal"))
+            {
+                var horizontalInput = Input.GetAxis("Horizontal");
+                if (horizontalInput > 0)
+                {
+                    var targetPosition = player.transform.position + Vector3.right * movementSpeed;
+                    player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                }
+                else
+                {
+                    var targetPosition = player.transform.position + Vector3.left * movementSpeed;
+                    player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                }
+                //connection.InvokeAsync("SetCoordinate", userName, player.transform.position.x, player.transform.position.z);
+            }
             if (Input.GetButtonDown("Horizontal"))
             {
                 var horizontalInput = Input.GetAxis("Horizontal");
                 if (horizontalInput > 0)
                 {
-                    player.transform.Translate(movementSpeed, 0, 0);
+                    Debug.Log("Start moving right!");
                 }
                 else
                 {
-                    player.transform.Translate(-movementSpeed, 0, 0);
+                    Debug.Log("Start moving left!");
                 }
-                connection.InvokeAsync("SetCoordinate", userName, player.transform.position.x, player.transform.position.z);
+            }
+            if (Input.GetButtonUp("Horizontal"))
+            {
+                var horizontalInput = Input.GetAxis("Horizontal");
+                if (horizontalInput > 0)
+                {
+                    Debug.Log("Stop moving right!");
+                }
+                else
+                {
+                    Debug.Log("Stop moving left!");
+                }
+            }
+
+            if (Input.GetButton("Vertical"))
+            {
+                var varticalInput = Input.GetAxis("Vertical");
+                if (varticalInput > 0)
+                {
+                    var targetPosition = player.transform.position + Vector3.forward * movementSpeed;
+                    player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                }
+                else
+                {
+                    var targetPosition = player.transform.position + Vector3.back * movementSpeed;
+                    player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                }
+                //connection.InvokeAsync("SetCoordinate", userName, player.transform.position.x, player.transform.position.z);
             }
             if (Input.GetButtonDown("Vertical"))
             {
                 var varticalInput = Input.GetAxis("Vertical");
                 if (varticalInput > 0)
                 {
-                    player.transform.Translate(0, 0, movementSpeed);
+                    Debug.Log("Start moving forward!");
                 }
                 else
                 {
-                    player.transform.Translate(0, 0, -movementSpeed);
+                    Debug.Log("Start moving back!");
                 }
-                connection.InvokeAsync("SetCoordinate", userName, player.transform.position.x, player.transform.position.z);
+            }
+            if (Input.GetButtonUp("Vertical"))
+            {
+                var horizontalInput = Input.GetAxis("Vertical");
+                if (horizontalInput > 0)
+                {
+                    Debug.Log("Stop moving forward!");
+                }
+                else
+                {
+                    Debug.Log("Stop moving back!");
+                }
             }
         }
     }
