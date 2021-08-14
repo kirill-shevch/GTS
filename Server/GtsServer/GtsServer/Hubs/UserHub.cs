@@ -30,6 +30,30 @@ namespace LoneLabWebApp.Services.Hubs
             await RemoveUser(userName);
         }
 
+        public async Task SetMovingForwardStatus(string userName, bool isMovingForward)
+        {
+            _players[userName].IsMovingForward = isMovingForward;
+            await SendUserList(_players);
+        }        
+        
+        public async Task SetMovingBackStatus(string userName, bool isMovingBack)
+        {
+            _players[userName].IsMovingBack = isMovingBack;
+            await SendUserList(_players);
+        }        
+        
+        public async Task SetMovingLeftStatus(string userName, bool isMovingLeft)
+        {
+            _players[userName].IsMovingLeft = isMovingLeft;
+            await SendUserList(_players);
+        }        
+        
+        public async Task SetMovingRightStatus(string userName, bool isMovingRight)
+        {
+            _players[userName].IsMovingRight = isMovingRight;
+            await SendUserList(_players);
+        }
+
         public async Task SetCoordinate(string userName, int x, int z)
         {
             _players[userName].X = x;

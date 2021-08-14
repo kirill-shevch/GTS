@@ -80,10 +80,12 @@ public class Main : MonoBehaviour
                 var horizontalInput = Input.GetAxis("Horizontal");
                 if (horizontalInput > 0)
                 {
+                    connection.InvokeAsync("SetMovingRightStatus", userName, true);
                     Debug.Log("Start moving right!");
                 }
                 else
                 {
+                    connection.InvokeAsync("SetMovingLeftStatus", userName, true);
                     Debug.Log("Start moving left!");
                 }
             }
@@ -92,10 +94,12 @@ public class Main : MonoBehaviour
                 var horizontalInput = Input.GetAxis("Horizontal");
                 if (horizontalInput > 0)
                 {
+                    connection.InvokeAsync("SetMovingRightStatus", userName, false);
                     Debug.Log("Stop moving right!");
                 }
                 else
                 {
+                    connection.InvokeAsync("SetMovingLeftStatus", userName, false);
                     Debug.Log("Stop moving left!");
                 }
             }
@@ -113,17 +117,18 @@ public class Main : MonoBehaviour
                     var targetPosition = player.transform.position + Vector3.back * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
                 }
-                //connection.InvokeAsync("SetCoordinate", userName, player.transform.position.x, player.transform.position.z);
             }
             if (Input.GetButtonDown("Vertical"))
             {
                 var varticalInput = Input.GetAxis("Vertical");
                 if (varticalInput > 0)
                 {
+                    connection.InvokeAsync("SetMovingForwardStatus", userName, true);
                     Debug.Log("Start moving forward!");
                 }
                 else
                 {
+                    connection.InvokeAsync("SetMovingBackStatus", userName, true);
                     Debug.Log("Start moving back!");
                 }
             }
@@ -132,10 +137,12 @@ public class Main : MonoBehaviour
                 var horizontalInput = Input.GetAxis("Vertical");
                 if (horizontalInput > 0)
                 {
+                    connection.InvokeAsync("SetMovingForwardStatus", userName, false);
                     Debug.Log("Stop moving forward!");
                 }
                 else
                 {
+                    connection.InvokeAsync("SetMovingBackStatus", userName, false);
                     Debug.Log("Stop moving back!");
                 }
             }
