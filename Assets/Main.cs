@@ -28,7 +28,7 @@ public class Main : MonoBehaviour
 
     private HubConnection connection;
 
-    private HashSet<string> scenePlayers = new HashSet<string>();
+    private Dictionary<string, Player> scenePlayers = new Dictionary<string, Player>();
 
     // Start is called before the first frame update
     void Start()
@@ -58,6 +58,30 @@ public class Main : MonoBehaviour
 
     void Update()
     {
+        foreach (var scenePlayer in scenePlayers)
+        {
+            var oldPlayer = GameObject.Find(scenePlayer.Key);
+            if (scenePlayer.Value.IsMovingRight)
+            {
+                var targetPosition = oldPlayer.transform.position + Vector3.right * movementSpeed;
+                oldPlayer.transform.position = Vector3.MoveTowards(oldPlayer.transform.position, targetPosition, step);
+            }
+            if (scenePlayer.Value.IsMovingLeft)
+            {
+                var targetPosition = oldPlayer.transform.position + Vector3.left * movementSpeed;
+                oldPlayer.transform.position = Vector3.MoveTowards(oldPlayer.transform.position, targetPosition, step);
+            }
+            if (scenePlayer.Value.IsMovingForward)
+            {
+                var targetPosition = oldPlayer.transform.position + Vector3.forward * movementSpeed;
+                oldPlayer.transform.position = Vector3.MoveTowards(oldPlayer.transform.position, targetPosition, step);
+            }            
+            if (scenePlayer.Value.IsMovingBack)
+            {
+                var targetPosition = oldPlayer.transform.position + Vector3.back * movementSpeed;
+                oldPlayer.transform.position = Vector3.MoveTowards(oldPlayer.transform.position, targetPosition, step);
+            }
+        }
         if (player != null)
         {
             if (Input.GetButton("Horizontal"))
@@ -195,9 +219,9 @@ public class Main : MonoBehaviour
             {
                 continue;
             }
-            else if (!scenePlayers.Contains(player.Key))
+            else if (!scenePlayers.ContainsKey(player.Key))
             {
-                scenePlayers.Add(player.Key);
+                scenePlayers.Add(player.Key, new Player { Name = player.Key, X = player.Value.X, Z = player.Value.Z });
                 var newPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 newPlayer.transform.position = new Vector3(player.Value.X, 1, player.Value.Z);
                 newPlayer.name = player.Key;
@@ -207,7 +231,11 @@ public class Main : MonoBehaviour
             else 
             {
                 var oldPlayer = GameObject.Find(player.Key);
-                oldPlayer.transform.position = new Vector3(player.Value.X, 1, player.Value.Z);
+                scenePlayers[player.Key].IsMovingForward = player.Value.IsMovingForward;
+                scenePlayers[player.Key].IsMovingBack = player.Value.IsMovingBack;
+                scenePlayers[player.Key].IsMovingLeft = player.Value.IsMovingLeft;
+                scenePlayers[player.Key].IsMovingRight = player.Value.IsMovingRight;
+                //oldPlayer.transform.position = new Vector3(player.Value.X, 1, player.Value.Z);
             }
         }
     }
