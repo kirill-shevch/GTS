@@ -32,32 +32,47 @@ namespace LoneLabWebApp.Services.Hubs
 
         public async Task SetMovingForwardStatus(string userName, bool isMovingForward)
         {
-            _players[userName].IsMovingForward = isMovingForward;
-            await SendUser(_players[userName]);
+            if (_players.ContainsKey(userName))
+            {
+                _players[userName].IsMovingForward = isMovingForward;
+                await SendUser(_players[userName]);
+            }
         }        
         
         public async Task SetMovingBackStatus(string userName, bool isMovingBack)
         {
-            _players[userName].IsMovingBack = isMovingBack;
-            await SendUser(_players[userName]);
+            if (_players.ContainsKey(userName))
+            {
+                _players[userName].IsMovingBack = isMovingBack;
+                await SendUser(_players[userName]);
+            }
         }        
         
         public async Task SetMovingLeftStatus(string userName, bool isMovingLeft)
         {
-            _players[userName].IsMovingLeft = isMovingLeft;
-            await SendUser(_players[userName]);
+            if (_players.ContainsKey(userName))
+            {
+                _players[userName].IsMovingLeft = isMovingLeft;
+                await SendUser(_players[userName]);
+            }
         }        
         
         public async Task SetMovingRightStatus(string userName, bool isMovingRight)
         {
-            _players[userName].IsMovingRight = isMovingRight;
-            await SendUser(_players[userName]);
+            if (_players.ContainsKey(userName))
+            {
+                _players[userName].IsMovingRight = isMovingRight;
+                await SendUser(_players[userName]);
+            }
         }
 
         public async Task Synchronize(Player player)
         {
-            _players[player.Name] = player;
-            await SendUser(player);
+            if (_players.ContainsKey(player.Name))
+            {
+                _players[player.Name] = player;
+                await SendUser(player);
+            }
         }
 
         public async Task SendUser(Player player)

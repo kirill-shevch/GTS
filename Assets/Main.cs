@@ -22,9 +22,11 @@ public class Main : MonoBehaviour
 
     private float movementSpeed = 2;
     private float timeModifier = 0.02f;
+    private float synchronizationTime = 1.0f;
     private float step;
 
     private string userName = "";
+    private Player userModel = new Player();
 
     private HubConnection connection;
 
@@ -33,6 +35,7 @@ public class Main : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Screen.SetResolution(640, 480, false);
         loginButtonObject = GameObject.Find("OkButton");
         loginButtonObject.GetComponentInChildren<Text>().text = "Ok";
         loginButton = loginButtonObject.GetComponent<Button>();
@@ -51,7 +54,7 @@ public class Main : MonoBehaviour
             .WithUrl("http://localhost:5000/userHub")
             .Build();
         connection.StartAsync();
-        connection.On<Dictionary<string, Player>> ("ReceiveUserList", x => ReceiveUserList(x));
+        connection.On<Player> ("SendUser", x => ReceiveUser(x));
         connection.On<string> ("RemoveUser", x => RemoveUser(x));
         step = movementSpeed * timeModifier;
     }
@@ -84,6 +87,12 @@ public class Main : MonoBehaviour
         }
         if (player != null)
         {
+            synchronizationTime -= Time.deltaTime;
+
+            if (synchronizationTime <= 0.0f)
+            {
+                timerEnded();
+            }
             if (Input.GetButton("Horizontal"))
             {
                 var horizontalInput = Input.GetAxis("Horizontal");
@@ -91,13 +100,26 @@ public class Main : MonoBehaviour
                 {
                     var targetPosition = player.transform.position + Vector3.right * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                    userModel.IsMovingRight = true;
+                    userModel.IsMovingLeft = false;
                 }
                 else
                 {
                     var targetPosition = player.transform.position + Vector3.left * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                    userModel.IsMovingLeft = true;
+                    userModel.IsMovingRight = false;
                 }
-                //connection.InvokeAsync("SetCoordinate", userName, player.transform.position.x, player.transform.position.z);
+            }
+            else if (userModel.IsMovingRight)
+            {
+                connection.InvokeAsync("SetMovingRightStatus", userName, false);
+                userModel.IsMovingRight = false;
+            }
+            else if (userModel.IsMovingLeft)
+            {
+                connection.InvokeAsync("SetMovingLeftStatus", userName, false);
+                userModel.IsMovingLeft = false;
             }
             if (Input.GetButtonDown("Horizontal"))
             {
@@ -105,27 +127,22 @@ public class Main : MonoBehaviour
                 if (horizontalInput > 0)
                 {
                     connection.InvokeAsync("SetMovingRightStatus", userName, true);
+                    userModel.IsMovingRight = true;
                     Debug.Log("Start moving right!");
                 }
                 else
                 {
                     connection.InvokeAsync("SetMovingLeftStatus", userName, true);
+                    userModel.IsMovingLeft = true;
                     Debug.Log("Start moving left!");
                 }
             }
             if (Input.GetButtonUp("Horizontal"))
             {
-                var horizontalInput = Input.GetAxis("Horizontal");
-                if (horizontalInput > 0)
-                {
-                    connection.InvokeAsync("SetMovingRightStatus", userName, false);
-                    Debug.Log("Stop moving right!");
-                }
-                else
-                {
-                    connection.InvokeAsync("SetMovingLeftStatus", userName, false);
-                    Debug.Log("Stop moving left!");
-                }
+                connection.InvokeAsync("SetMovingRightStatus", userName, false);
+                userModel.IsMovingRight = false;
+                connection.InvokeAsync("SetMovingLeftStatus", userName, false);
+                userModel.IsMovingLeft = false; 
             }
 
             if (Input.GetButton("Vertical"))
@@ -135,12 +152,26 @@ public class Main : MonoBehaviour
                 {
                     var targetPosition = player.transform.position + Vector3.forward * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                    userModel.IsMovingForward = true;
+                    userModel.IsMovingBack = false;
                 }
                 else
                 {
                     var targetPosition = player.transform.position + Vector3.back * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                    userModel.IsMovingBack = true;
+                    userModel.IsMovingForward = false;
                 }
+            }
+            else if (userModel.IsMovingForward)
+            {
+                connection.InvokeAsync("SetMovingForwardStatus", userName, false);
+                userModel.IsMovingForward = false;
+            }
+            else if (userModel.IsMovingBack)
+            {
+                connection.InvokeAsync("SetMovingBackStatus", userName, false);
+                userModel.IsMovingBack = false;
             }
             if (Input.GetButtonDown("Vertical"))
             {
@@ -148,29 +179,30 @@ public class Main : MonoBehaviour
                 if (varticalInput > 0)
                 {
                     connection.InvokeAsync("SetMovingForwardStatus", userName, true);
-                    Debug.Log("Start moving forward!");
+                    userModel.IsMovingForward = true;
                 }
                 else
                 {
                     connection.InvokeAsync("SetMovingBackStatus", userName, true);
-                    Debug.Log("Start moving back!");
+                    userModel.IsMovingBack = true;
                 }
             }
             if (Input.GetButtonUp("Vertical"))
             {
-                var horizontalInput = Input.GetAxis("Vertical");
-                if (horizontalInput > 0)
-                {
-                    connection.InvokeAsync("SetMovingForwardStatus", userName, false);
-                    Debug.Log("Stop moving forward!");
-                }
-                else
-                {
-                    connection.InvokeAsync("SetMovingBackStatus", userName, false);
-                    Debug.Log("Stop moving back!");
-                }
+                connection.InvokeAsync("SetMovingForwardStatus", userName, false);
+                userModel.IsMovingForward = false;
+                connection.InvokeAsync("SetMovingBackStatus", userName, false);
+                userModel.IsMovingBack = false;
             }
         }
+    }
+
+    private void timerEnded()
+    {
+        synchronizationTime = 0.5f;
+        userModel.X = player.transform.position.x;
+        userModel.Z = player.transform.position.z;
+        connection.InvokeAsync("Synchronize", userModel);
     }
 
     void OnDestroy()
@@ -196,6 +228,7 @@ public class Main : MonoBehaviour
             player.transform.position = new Vector3(20, 1, 20);
             var playerRenderer = player.GetComponent<Renderer>();
             playerRenderer.material.SetColor("_Color", Random.ColorHSV());
+            userModel.Name = userName;
 
             loginButtonObject.SetActive(false);
             nameFieldObject.SetActive(false);
@@ -211,32 +244,37 @@ public class Main : MonoBehaviour
         errorButtonObject.SetActive(false);
     }
 
-    void ReceiveUserList(Dictionary<string, Player> players)
+    void ReceiveUser(Player player)
     {
-        foreach (var player in players)
+        if (player.Name == userName)
         {
-            if (player.Key == userName)
+            return;
+        }
+        else if (!scenePlayers.ContainsKey(player.Name))
+        {
+            scenePlayers.Add(player.Name, new Player { Name = player.Name, X = player.X, Z = player.Z });
+            var newPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            newPlayer.transform.position = new Vector3(player.X, 1, player.Z);
+            newPlayer.name = player.Name;
+            var newPlayerRenderer = newPlayer.GetComponent<Renderer>();
+            newPlayerRenderer.material.SetColor("_Color", Random.ColorHSV());
+        }
+        else
+        {
+            var oldPlayer = GameObject.Find(player.Name);
+            scenePlayers[player.Name].IsMovingForward = player.IsMovingForward;
+            scenePlayers[player.Name].IsMovingBack = player.IsMovingBack;
+            scenePlayers[player.Name].IsMovingLeft = player.IsMovingLeft;
+            scenePlayers[player.Name].IsMovingRight = player.IsMovingRight;
+            if (Mathf.Abs(oldPlayer.transform.position.x - player.X) > 1)
             {
-                continue;
+                oldPlayer.transform.position = new Vector3(player.X, 1, oldPlayer.transform.position.z);
             }
-            else if (!scenePlayers.ContainsKey(player.Key))
+            if (Mathf.Abs(oldPlayer.transform.position.z - player.Z) > 1)
             {
-                scenePlayers.Add(player.Key, new Player { Name = player.Key, X = player.Value.X, Z = player.Value.Z });
-                var newPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                newPlayer.transform.position = new Vector3(player.Value.X, 1, player.Value.Z);
-                newPlayer.name = player.Key;
-                var newPlayerRenderer = newPlayer.GetComponent<Renderer>();
-                newPlayerRenderer.material.SetColor("_Color", Random.ColorHSV());
+                oldPlayer.transform.position = new Vector3(oldPlayer.transform.position.x, 1, player.Z);
             }
-            else 
-            {
-                var oldPlayer = GameObject.Find(player.Key);
-                scenePlayers[player.Key].IsMovingForward = player.Value.IsMovingForward;
-                scenePlayers[player.Key].IsMovingBack = player.Value.IsMovingBack;
-                scenePlayers[player.Key].IsMovingLeft = player.Value.IsMovingLeft;
-                scenePlayers[player.Key].IsMovingRight = player.Value.IsMovingRight;
-                //oldPlayer.transform.position = new Vector3(player.Value.X, 1, player.Value.Z);
-            }
+            //oldPlayer.transform.position = new Vector3(player.X, 1, player.Z);
         }
     }
 
