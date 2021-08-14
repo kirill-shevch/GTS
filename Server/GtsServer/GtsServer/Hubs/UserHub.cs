@@ -15,11 +15,12 @@ namespace LoneLabWebApp.Services.Hubs
         {
         }
 
-        public async Task AddUserName(string userName)
+        public async Task AddUserName(string userName, string connectionId)
         {
             _players.Add(userName, new Player
             {
-                Name = userName
+                Name = userName,
+                ConnectionId = connectionId
             });
             await SendUser(_players[userName]);
         }
@@ -41,7 +42,7 @@ namespace LoneLabWebApp.Services.Hubs
 
         public async Task SendUser(Player player)
         {
-            await Clients?.All.SendAsync("SendUser", player);
+            await Clients?.AllExcept(new List<string> { player.ConnectionId }).SendAsync("SendUser", player);
         }
 
         public async Task RemoveUser(string playerName)

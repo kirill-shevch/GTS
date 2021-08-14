@@ -52,7 +52,7 @@ public class Main : MonoBehaviour
         foreach (var scenePlayer in scenePlayers)
         {
             var oldPlayer = GameObject.Find(scenePlayer.Key);
-            var destination = new Vector3(scenePlayer.Value.ServerX, 1, scenePlayer.Value.ServerZ);
+            var destination = new Vector3(scenePlayer.Value.X, 1, scenePlayer.Value.Z);
             oldPlayer.transform.position = Vector3.MoveTowards(oldPlayer.transform.position, destination, step);
         }
         if (player != null)
@@ -127,10 +127,11 @@ public class Main : MonoBehaviour
             var playerRenderer = player.GetComponent<Renderer>();
             playerRenderer.material.SetColor("_Color", Random.ColorHSV());
             userModel.Name = userName;
+            userModel.ConnectionId = connection.ConnectionId;
 
             GameObject.Find("OkButton").SetActive(false);
             GameObject.Find("NameField").SetActive(false);
-            connection.InvokeAsync("AddUserName", userName);
+            connection.InvokeAsync("AddUserName", userName, connection.ConnectionId);
             var errorText = GameObject.Find("UserName").GetComponent<Text>();
             errorText.text = userName;
         }
@@ -162,8 +163,8 @@ public class Main : MonoBehaviour
         else
         {
             var oldPlayer = GameObject.Find(player.Name);
-            scenePlayers[player.Name].ServerX = player.X;
-            scenePlayers[player.Name].ServerZ = player.Z;
+            scenePlayers[player.Name].X = player.X;
+            scenePlayers[player.Name].Z = player.Z;
         }
     }
 
