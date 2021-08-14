@@ -21,7 +21,7 @@ namespace LoneLabWebApp.Services.Hubs
             {
                 Name = userName
             });
-            await SendUserList(_players);
+            await SendUser(_players[userName]);
         }
 
         public async Task RemoveUserName(string userName)
@@ -33,37 +33,36 @@ namespace LoneLabWebApp.Services.Hubs
         public async Task SetMovingForwardStatus(string userName, bool isMovingForward)
         {
             _players[userName].IsMovingForward = isMovingForward;
-            await SendUserList(_players);
+            await SendUser(_players[userName]);
         }        
         
         public async Task SetMovingBackStatus(string userName, bool isMovingBack)
         {
             _players[userName].IsMovingBack = isMovingBack;
-            await SendUserList(_players);
+            await SendUser(_players[userName]);
         }        
         
         public async Task SetMovingLeftStatus(string userName, bool isMovingLeft)
         {
             _players[userName].IsMovingLeft = isMovingLeft;
-            await SendUserList(_players);
+            await SendUser(_players[userName]);
         }        
         
         public async Task SetMovingRightStatus(string userName, bool isMovingRight)
         {
             _players[userName].IsMovingRight = isMovingRight;
-            await SendUserList(_players);
+            await SendUser(_players[userName]);
         }
 
-        public async Task SetCoordinate(string userName, int x, int z)
+        public async Task Synchronize(Player player)
         {
-            _players[userName].X = x;
-            _players[userName].Z = z;
-            await SendUserList(_players);
+            _players[player.Name] = player;
+            await SendUser(player);
         }
 
-        public async Task SendUserList(Dictionary<string, Player> players)
+        public async Task SendUser(Player player)
         {
-            await Clients?.All.SendAsync("ReceiveUserList", players);
+            await Clients?.All.SendAsync("SendUser", player);
         }
 
         public async Task RemoveUser(string playerName)
