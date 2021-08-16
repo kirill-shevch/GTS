@@ -70,11 +70,13 @@ public class Main : MonoBehaviour
                 {
                     var targetPosition = player.transform.position + Vector3.right * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                    userModel.Direction = Direction.Right;
                 }
                 else
                 {
                     var targetPosition = player.transform.position + Vector3.left * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                    userModel.Direction = Direction.Left;
                 }
             }
 
@@ -85,11 +87,13 @@ public class Main : MonoBehaviour
                 {
                     var targetPosition = player.transform.position + Vector3.forward * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                    userModel.Direction = Direction.Top;
                 }
                 else
                 {
                     var targetPosition = player.transform.position + Vector3.back * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                    userModel.Direction = Direction.Bot;
                 }
             }
         }
@@ -97,7 +101,7 @@ public class Main : MonoBehaviour
 
     private void timerEnded()
     {
-        synchronizationTime = 0.1f;
+        synchronizationTime = 0.05f;
         userModel.X = player.transform.position.x;
         userModel.Z = player.transform.position.z;
         connection.InvokeAsync("Synchronize", userModel);
@@ -153,7 +157,7 @@ public class Main : MonoBehaviour
         }
         else if (!scenePlayers.ContainsKey(player.Name))
         {
-            scenePlayers.Add(player.Name, new Player { Name = player.Name, X = player.X, Z = player.Z });
+            scenePlayers.Add(player.Name, player);
             var newPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
             newPlayer.transform.position = new Vector3(player.X, 1, player.Z);
             newPlayer.name = player.Name;
@@ -162,9 +166,9 @@ public class Main : MonoBehaviour
         }
         else
         {
-            var oldPlayer = GameObject.Find(player.Name);
             scenePlayers[player.Name].X = player.X;
             scenePlayers[player.Name].Z = player.Z;
+            scenePlayers[player.Name].Direction = player.Direction;
         }
     }
 
