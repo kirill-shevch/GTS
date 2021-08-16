@@ -9,9 +9,8 @@ public class Main : MonoBehaviour
     private GameObject player;
 
     private float movementSpeed = 2;
-    private float timeModifier = 0.02f;
     private float synchronizationTime = 1.0f;
-    private float step;
+    private float fireCoolDownTime = 0.3f;
 
     private string userName = "";
     private ClientPlayer userModel = new ClientPlayer();
@@ -19,6 +18,7 @@ public class Main : MonoBehaviour
     private HubConnection connection;
 
     private Dictionary<string, ClientPlayer> scenePlayers = new Dictionary<string, ClientPlayer>();
+    private List<Projectile> projectiles = new List<Projectile>();
 
     // Start is called before the first frame update
     void Start()
@@ -44,24 +44,41 @@ public class Main : MonoBehaviour
         connection.StartAsync();
         connection.On<ServerPlayer>("SendUser", x => ReceiveUser(x));
         connection.On<string>("RemoveUser", x => RemoveUser(x));
-        step = movementSpeed * timeModifier;
     }
 
     void Update()
     {
+        var step = movementSpeed * Time.deltaTime;
         foreach (var scenePlayer in scenePlayers)
         {
             var oldPlayer = GameObject.Find(scenePlayer.Key);
             var destination = new Vector3(scenePlayer.Value.X, 1, scenePlayer.Value.Z);
             oldPlayer.transform.position = Vector3.MoveTowards(oldPlayer.transform.position, destination, step);
         }
+        foreach (var projectile in projectiles)
+        {
+            projectile.Move(Time.deltaTime);
+            if (projectile.IsOver)
+            {
+                GameObject.Destroy(projectile.ProjectileGameObject);
+            }
+        }
+        projectiles.RemoveAll(x => x.IsOver);
         if (player != null)
         {
             synchronizationTime -= Time.deltaTime;
 
             if (synchronizationTime <= 0.0f)
             {
-                timerEnded();
+                TimerEnded();
+            }
+            if (userModel.IsOnCoolDown)
+            {
+                fireCoolDownTime -= Time.deltaTime;
+                if (fireCoolDownTime <= 0.0f)
+                {
+                    userModel.IsOnCoolDown = false;
+                }
             }
             if (Input.GetButton("Horizontal"))
             {
@@ -97,14 +114,29 @@ public class Main : MonoBehaviour
                 }
             }
 
-            if (Input.GetButton("Fire1"))
+            if (Input.GetButton("Fire1") && !userModel.IsOnCoolDown)
             {
-                Debug.Log("Fire1");
+                Shoot(userModel.X, userModel.Z, userModel.Direction);
+                fireCoolDownTime = 0.3f;
+                userModel.IsOnCoolDown = true;
             }
         }
     }
 
-    private void timerEnded()
+    private void Shoot(float x, float z, Direction direction)
+    {
+        var projectileGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        var position = new Vector3(x, 1, z);
+        projectileGameObject.transform.position = position;
+
+        projectiles.Add(new Projectile
+        {
+            Direction = direction,
+            ProjectileGameObject = projectileGameObject
+        });
+    }
+
+    private void TimerEnded()
     {
         synchronizationTime = 0.05f;
         userModel.X = player.transform.position.x;

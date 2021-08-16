@@ -7,7 +7,7 @@
         public float Z { get; set; } = 20;
         public string ConnectionId { get; set; }
         public Direction Direction { get; set; } = Direction.Top;
-        public float FireCoolDown { get; set; } = 0.3f;
+        public bool IsOnCoolDown { get; set; } = false;
 
         public ServerPlayer ConvertToServerPlayer()
         {
