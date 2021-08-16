@@ -1,6 +1,6 @@
 ﻿namespace GtsServer.Models
 {
-    public class Player
+    public class ServerPlayer
     {
         public string Name { get; set; }
         public float X { get; set; } = 20;

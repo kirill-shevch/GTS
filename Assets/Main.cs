@@ -14,11 +14,11 @@ public class Main : MonoBehaviour
     private float step;
 
     private string userName = "";
-    private Player userModel = new Player();
+    private ClientPlayer userModel = new ClientPlayer();
 
     private HubConnection connection;
 
-    private Dictionary<string, Player> scenePlayers = new Dictionary<string, Player>();
+    private Dictionary<string, ClientPlayer> scenePlayers = new Dictionary<string, ClientPlayer>();
 
     // Start is called before the first frame update
     void Start()
@@ -42,7 +42,7 @@ public class Main : MonoBehaviour
             .WithUrl("http://localhost:5000/userHub")
             .Build();
         connection.StartAsync();
-        connection.On<Player>("SendUser", x => ReceiveUser(x));
+        connection.On<ServerPlayer>("SendUser", x => ReceiveUser(x));
         connection.On<string>("RemoveUser", x => RemoveUser(x));
         step = movementSpeed * timeModifier;
     }
@@ -95,6 +95,11 @@ public class Main : MonoBehaviour
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
                     userModel.Direction = Direction.Bot;
                 }
+            }
+
+            if (Input.GetButton("Fire1"))
+            {
+                Debug.Log("Fire1");
             }
         }
     }
@@ -149,7 +154,7 @@ public class Main : MonoBehaviour
         GameObject.Find("ErrorButton").SetActive(false);
     }
 
-    void ReceiveUser(Player player)
+    void ReceiveUser(ServerPlayer player)
     {
         if (player.Name == userName)
         {
@@ -157,7 +162,7 @@ public class Main : MonoBehaviour
         }
         else if (!scenePlayers.ContainsKey(player.Name))
         {
-            scenePlayers.Add(player.Name, player);
+            scenePlayers.Add(player.Name, player.ConverToClientPlayer());
             var newPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
             newPlayer.transform.position = new Vector3(player.X, 1, player.Z);
             newPlayer.name = player.Name;

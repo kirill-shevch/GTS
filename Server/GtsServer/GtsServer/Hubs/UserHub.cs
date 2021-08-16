@@ -9,7 +9,7 @@ namespace LoneLabWebApp.Services.Hubs
 {
     public class UserHub : Hub
     {
-        private Dictionary<string, Player> _players = new Dictionary<string, Player>();
+        private Dictionary<string, ServerPlayer> _players = new Dictionary<string, ServerPlayer>();
 
         public UserHub()
         {
@@ -17,7 +17,7 @@ namespace LoneLabWebApp.Services.Hubs
 
         public async Task AddUserName(string userName, string connectionId)
         {
-            _players.Add(userName, new Player
+            _players.Add(userName, new ServerPlayer
             {
                 Name = userName,
                 ConnectionId = connectionId
@@ -31,7 +31,7 @@ namespace LoneLabWebApp.Services.Hubs
             await RemoveUser(userName);
         }
 
-        public async Task Synchronize(Player player)
+        public async Task Synchronize(ServerPlayer player)
         {
             if (_players.ContainsKey(player.Name))
             {
@@ -40,7 +40,7 @@ namespace LoneLabWebApp.Services.Hubs
             }
         }
 
-        public async Task SendUser(Player player)
+        public async Task SendUser(ServerPlayer player)
         {
             await Clients?.AllExcept(new List<string> { player.ConnectionId }).SendAsync("SendUser", player);
         }
