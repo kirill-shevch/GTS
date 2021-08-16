@@ -1,8 +1,6 @@
 ﻿using GtsServer.Models;
 using Microsoft.AspNetCore.SignalR;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace LoneLabWebApp.Services.Hubs
@@ -48,6 +46,11 @@ namespace LoneLabWebApp.Services.Hubs
         public async Task RemoveUser(string playerName)
         {
             await Clients?.All.SendAsync("RemoveUser", playerName);
+        }
+
+        public async Task CreateProjectile(float x, float z, Direction direction)
+        {
+            await Clients?.All.SendAsync("Shoot", x, z, direction);
         }
     }
 }

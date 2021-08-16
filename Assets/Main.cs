@@ -44,6 +44,7 @@ public class Main : MonoBehaviour
         connection.StartAsync();
         connection.On<ServerPlayer>("SendUser", x => ReceiveUser(x));
         connection.On<string>("RemoveUser", x => RemoveUser(x));
+        connection.On<float, float, Direction>("Shoot", (x, z, direction) => Shoot(x, z, direction));
     }
 
     void Update()
@@ -116,7 +117,7 @@ public class Main : MonoBehaviour
 
             if (Input.GetButton("Fire1") && !userModel.IsOnCoolDown)
             {
-                Shoot(userModel.X, userModel.Z, userModel.Direction);
+                connection.InvokeAsync("CreateProjectile", userModel.X, userModel.Z, userModel.Direction);
                 fireCoolDownTime = 0.3f;
                 userModel.IsOnCoolDown = true;
             }
