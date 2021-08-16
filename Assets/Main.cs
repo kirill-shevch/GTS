@@ -1,7 +1,6 @@
 ﻿using Assets.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,37 +8,31 @@ public class Main : MonoBehaviour
 {
     private GameObject player;
 
-    private GameObject loginButtonObject;
-    private Button loginButton;
-
-    private GameObject errorButtonObject;
-    private Button errorButton;
-
-    private Text errorText;
-
-    private GameObject nameFieldObject;
-    private InputField nameField;
-
-    private float movementSpeed = 1;
+    private float movementSpeed = 2;
+    private float timeModifier = 0.02f;
+    private float synchronizationTime = 1.0f;
+    private float step;
 
     private string userName = "";
+    private Player userModel = new Player();
 
     private HubConnection connection;
 
-    private HashSet<string> scenePlayers = new HashSet<string>();
+    private Dictionary<string, Player> scenePlayers = new Dictionary<string, Player>();
 
     // Start is called before the first frame update
     void Start()
     {
-        loginButtonObject = GameObject.Find("OkButton");
+        Screen.SetResolution(640, 480, false);
+        var loginButtonObject = GameObject.Find("OkButton");
         loginButtonObject.GetComponentInChildren<Text>().text = "Ok";
-        loginButton = loginButtonObject.GetComponent<Button>();
-        nameFieldObject = GameObject.Find("NameField");
-        nameField = nameFieldObject.GetComponent<InputField>();
-        errorButtonObject = GameObject.Find("ErrorButton");
+        var loginButton = loginButtonObject.GetComponent<Button>();
+        var nameFieldObject = GameObject.Find("NameField");
+        var nameField = nameFieldObject.GetComponent<InputField>();
+        var errorButtonObject = GameObject.Find("ErrorButton");
         errorButtonObject.GetComponentInChildren<Text>().text = "Ok";
-        errorButton = errorButtonObject.GetComponent<Button>();
-        errorText = GameObject.Find("ErrorText").GetComponent<Text>();
+        var errorButton = errorButtonObject.GetComponent<Button>();
+        var errorText = GameObject.Find("ErrorText").GetComponent<Text>();
         loginButton.onClick.AddListener(OnLoginClick);
         errorButton.onClick.AddListener(OnErrorClick);
         errorText.enabled = false;
@@ -49,41 +42,65 @@ public class Main : MonoBehaviour
             .WithUrl("http://localhost:5000/userHub")
             .Build();
         connection.StartAsync();
-        connection.On<Dictionary<string, Player>> ("ReceiveUserList", x => ReceiveUserList(x));
-        connection.On<string> ("RemoveUser", x => RemoveUser(x));
+        connection.On<Player>("SendUser", x => ReceiveUser(x));
+        connection.On<string>("RemoveUser", x => RemoveUser(x));
+        step = movementSpeed * timeModifier;
     }
 
     void Update()
     {
+        foreach (var scenePlayer in scenePlayers)
+        {
+            var oldPlayer = GameObject.Find(scenePlayer.Key);
+            var destination = new Vector3(scenePlayer.Value.X, 1, scenePlayer.Value.Z);
+            oldPlayer.transform.position = Vector3.MoveTowards(oldPlayer.transform.position, destination, step);
+        }
         if (player != null)
         {
-            if (Input.GetButtonDown("Horizontal"))
+            synchronizationTime -= Time.deltaTime;
+
+            if (synchronizationTime <= 0.0f)
+            {
+                timerEnded();
+            }
+            if (Input.GetButton("Horizontal"))
             {
                 var horizontalInput = Input.GetAxis("Horizontal");
                 if (horizontalInput > 0)
                 {
-                    player.transform.Translate(movementSpeed, 0, 0);
+                    var targetPosition = player.transform.position + Vector3.right * movementSpeed;
+                    player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
                 }
                 else
                 {
-                    player.transform.Translate(-movementSpeed, 0, 0);
+                    var targetPosition = player.transform.position + Vector3.left * movementSpeed;
+                    player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
                 }
-                connection.InvokeAsync("SetCoordinate", userName, player.transform.position.x, player.transform.position.z);
             }
-            if (Input.GetButtonDown("Vertical"))
+
+            if (Input.GetButton("Vertical"))
             {
                 var varticalInput = Input.GetAxis("Vertical");
                 if (varticalInput > 0)
                 {
-                    player.transform.Translate(0, 0, movementSpeed);
+                    var targetPosition = player.transform.position + Vector3.forward * movementSpeed;
+                    player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
                 }
                 else
                 {
-                    player.transform.Translate(0, 0, -movementSpeed);
+                    var targetPosition = player.transform.position + Vector3.back * movementSpeed;
+                    player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
                 }
-                connection.InvokeAsync("SetCoordinate", userName, player.transform.position.x, player.transform.position.z);
             }
         }
+    }
+
+    private void timerEnded()
+    {
+        synchronizationTime = 0.1f;
+        userModel.X = player.transform.position.x;
+        userModel.Z = player.transform.position.z;
+        connection.InvokeAsync("Synchronize", userModel);
     }
 
     void OnDestroy()
@@ -94,14 +111,14 @@ public class Main : MonoBehaviour
 
     void OnLoginClick()
     {
-        userName = nameField.text;
+        userName = GameObject.Find("NameField").GetComponent<InputField>().text;
         if (string.IsNullOrWhiteSpace(userName))
         {
-            loginButtonObject.SetActive(false);
-            nameFieldObject.SetActive(false);
-            errorText.text = "User name should not be empty!";
-            errorText.enabled = true;
-            errorButtonObject.SetActive(true);
+            GameObject.Find("OkButton").SetActive(false);
+            GameObject.Find("NameField").SetActive(false);
+            GameObject.Find("ErrorText").GetComponent<Text>().text = "User name should not be empty!";
+            GameObject.Find("ErrorText").GetComponent<Text>().enabled = true;
+            GameObject.Find("ErrorButton").SetActive(true);
         }
         else
         {
@@ -109,43 +126,45 @@ public class Main : MonoBehaviour
             player.transform.position = new Vector3(20, 1, 20);
             var playerRenderer = player.GetComponent<Renderer>();
             playerRenderer.material.SetColor("_Color", Random.ColorHSV());
+            userModel.Name = userName;
+            userModel.ConnectionId = connection.ConnectionId;
 
-            loginButtonObject.SetActive(false);
-            nameFieldObject.SetActive(false);
-            connection.InvokeAsync("AddUserName", userName);
+            GameObject.Find("OkButton").SetActive(false);
+            GameObject.Find("NameField").SetActive(false);
+            connection.InvokeAsync("AddUserName", userName, connection.ConnectionId);
+            var errorText = GameObject.Find("UserName").GetComponent<Text>();
+            errorText.text = userName;
         }
     }
 
     void OnErrorClick()
     {
-        loginButtonObject.SetActive(true);
-        nameFieldObject.SetActive(true);
-        errorText.enabled = false;
-        errorButtonObject.SetActive(false);
+        GameObject.Find("OkButton").SetActive(true);
+        GameObject.Find("NameField").SetActive(true);
+        GameObject.Find("ErrorText").GetComponent<Text>().enabled = false;
+        GameObject.Find("ErrorButton").SetActive(false);
     }
 
-    void ReceiveUserList(Dictionary<string, Player> players)
+    void ReceiveUser(Player player)
     {
-        foreach (var player in players)
+        if (player.Name == userName)
         {
-            if (player.Key == userName)
-            {
-                continue;
-            }
-            else if (!scenePlayers.Contains(player.Key))
-            {
-                scenePlayers.Add(player.Key);
-                var newPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                newPlayer.transform.position = new Vector3(player.Value.X, 1, player.Value.Z);
-                newPlayer.name = player.Key;
-                var newPlayerRenderer = newPlayer.GetComponent<Renderer>();
-                newPlayerRenderer.material.SetColor("_Color", Random.ColorHSV());
-            }
-            else 
-            {
-                var oldPlayer = GameObject.Find(player.Key);
-                oldPlayer.transform.position = new Vector3(player.Value.X, 1, player.Value.Z);
-            }
+            return;
+        }
+        else if (!scenePlayers.ContainsKey(player.Name))
+        {
+            scenePlayers.Add(player.Name, new Player { Name = player.Name, X = player.X, Z = player.Z });
+            var newPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            newPlayer.transform.position = new Vector3(player.X, 1, player.Z);
+            newPlayer.name = player.Name;
+            var newPlayerRenderer = newPlayer.GetComponent<Renderer>();
+            newPlayerRenderer.material.SetColor("_Color", Random.ColorHSV());
+        }
+        else
+        {
+            var oldPlayer = GameObject.Find(player.Name);
+            scenePlayers[player.Name].X = player.X;
+            scenePlayers[player.Name].Z = player.Z;
         }
     }
 

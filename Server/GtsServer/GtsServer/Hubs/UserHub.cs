@@ -15,13 +15,14 @@ namespace LoneLabWebApp.Services.Hubs
         {
         }
 
-        public async Task AddUserName(string userName)
+        public async Task AddUserName(string userName, string connectionId)
         {
             _players.Add(userName, new Player
             {
-                Name = userName
+                Name = userName,
+                ConnectionId = connectionId
             });
-            await SendUserList(_players);
+            await SendUser(_players[userName]);
         }
 
         public async Task RemoveUserName(string userName)
@@ -30,16 +31,18 @@ namespace LoneLabWebApp.Services.Hubs
             await RemoveUser(userName);
         }
 
-        public async Task SetCoordinate(string userName, int x, int z)
+        public async Task Synchronize(Player player)
         {
-            _players[userName].X = x;
-            _players[userName].Z = z;
-            await SendUserList(_players);
+            if (_players.ContainsKey(player.Name))
+            {
+                _players[player.Name] = player;
+                await SendUser(player);
+            }
         }
 
-        public async Task SendUserList(Dictionary<string, Player> players)
+        public async Task SendUser(Player player)
         {
-            await Clients?.All.SendAsync("ReceiveUserList", players);
+            await Clients?.AllExcept(new List<string> { player.ConnectionId }).SendAsync("SendUser", player);
         }
 
         public async Task RemoveUser(string playerName)
