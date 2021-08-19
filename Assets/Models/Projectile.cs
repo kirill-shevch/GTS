@@ -17,7 +17,7 @@ namespace Assets.Models
         {
             var step = speed * deltaTime;
             lifetime -= deltaTime;
-            if (lifetime < 0.0f)
+            if (lifetime < 0.0f || IsOver)
             {
                 IsOver = true;
                 return;

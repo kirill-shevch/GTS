@@ -15,12 +15,10 @@ public class Main : MonoBehaviour
     private float fireCoolDownTime = 0.3f;
 
     private string userName = "";
-    private ClientPlayer userModel = new ClientPlayer();
 
     private HubConnection connection;
 
-    private Dictionary<string, ClientPlayer> scenePlayers = new Dictionary<string, ClientPlayer>();
-    private List<Projectile> projectiles = new List<Projectile>();
+
 
     // Start is called before the first frame update
     void Start()
@@ -58,21 +56,23 @@ public class Main : MonoBehaviour
     void Update()
     {
         var step = movementSpeed * Time.deltaTime;
-        foreach (var scenePlayer in scenePlayers)
+        foreach (var scenePlayer in SceneObjects.ScenePlayers)
         {
             var oldPlayer = GameObject.Find(scenePlayer.Key);
             var destination = new Vector3(scenePlayer.Value.X, 1, scenePlayer.Value.Z);
             oldPlayer.transform.position = Vector3.MoveTowards(oldPlayer.transform.position, destination, step);
         }
-        foreach (var projectile in projectiles)
+        var uidsToDelete = new List<string>();
+        foreach (var projectile in SceneObjects.Projectiles.Values)
         {
             projectile.Move(Time.deltaTime);
             if (projectile.IsOver)
             {
+                uidsToDelete.Add(projectile.Uid);
                 GameObject.Destroy(projectile.ProjectileGameObject);
             }
         }
-        projectiles.RemoveAll(x => x.IsOver);
+        uidsToDelete.ForEach(x => SceneObjects.Projectiles.Remove(x));
         if (player != null)
         {
             synchronizationTime -= Time.deltaTime;
@@ -81,22 +81,22 @@ public class Main : MonoBehaviour
             {
                 TimerEnded();
             }
-            if (userModel.IsInvulnerable)
+            if (SceneObjects.UserModel.IsInvulnerable)
             {
-                userModel.InvulnerableTimer -= Time.deltaTime;
-                if (userModel.InvulnerableTimer <= 0.0f)
+                SceneObjects.UserModel.InvulnerableTimer -= Time.deltaTime;
+                if (SceneObjects.UserModel.InvulnerableTimer <= 0.0f)
                 {
-                    userModel.IsInvulnerable = false;
+                    SceneObjects.UserModel.IsInvulnerable = false;
                     var invulnerableStatus = GameObject.Find("InvulnerableStatus").GetComponent<Text>();
                     invulnerableStatus.text = string.Empty;
                 }
             }
-            if (userModel.IsOnCoolDown)
+            if (SceneObjects.UserModel.IsOnCoolDown)
             {
                 fireCoolDownTime -= Time.deltaTime;
                 if (fireCoolDownTime <= 0.0f)
                 {
-                    userModel.IsOnCoolDown = false;
+                    SceneObjects.UserModel.IsOnCoolDown = false;
                 }
             }
             if (Input.GetButton("Horizontal"))
@@ -106,13 +106,13 @@ public class Main : MonoBehaviour
                 {
                     var targetPosition = player.transform.position + Vector3.right * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
-                    userModel.Direction = Direction.Right;
+                    SceneObjects.UserModel.Direction = Direction.Right;
                 }
                 else
                 {
                     var targetPosition = player.transform.position + Vector3.left * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
-                    userModel.Direction = Direction.Left;
+                    SceneObjects.UserModel.Direction = Direction.Left;
                 }
             }
 
@@ -123,21 +123,25 @@ public class Main : MonoBehaviour
                 {
                     var targetPosition = player.transform.position + Vector3.forward * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
-                    userModel.Direction = Direction.Top;
+                    SceneObjects.UserModel.Direction = Direction.Top;
                 }
                 else
                 {
                     var targetPosition = player.transform.position + Vector3.back * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
-                    userModel.Direction = Direction.Bot;
+                    SceneObjects.UserModel.Direction = Direction.Bot;
                 }
             }
 
-            if (Input.GetButton("Fire1") && !userModel.IsOnCoolDown)
+            if (Input.GetButton("Fire1") && !SceneObjects.UserModel.IsOnCoolDown)
             {
-                connection.InvokeAsync("CreateProjectile", userModel.X, userModel.Z, userModel.Direction, userModel.Name);
+                connection.InvokeAsync("CreateProjectile", 
+                    SceneObjects.UserModel.X, 
+                    SceneObjects.UserModel.Z, 
+                    SceneObjects.UserModel.Direction,
+                    SceneObjects.UserModel.Name);
                 fireCoolDownTime = 0.3f;
-                userModel.IsOnCoolDown = true;
+                SceneObjects.UserModel.IsOnCoolDown = true;
             }
         }
     }
@@ -150,13 +154,32 @@ public class Main : MonoBehaviour
     private void Shoot(float x, float z, Direction direction, string shooterName)
     {
         var projectileGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        switch (direction)
+        {
+            case Direction.Top:
+                z++;
+                break;
+            case Direction.Bot:
+                z--;
+                break;
+            case Direction.Left:
+                x--;
+                break;
+            case Direction.Right:
+                x++;
+                break;
+            default:
+                break;
+        }
         var position = new Vector3(x, 1, z);
         var uid = Guid.NewGuid().ToString();
         projectileGameObject.transform.position = position;
         projectileGameObject.tag = "Projectile";
         projectileGameObject.name = uid;
+        projectileGameObject.AddComponent<ProjectileCollisionDetector>();
 
-        projectiles.Add(new Projectile
+
+        SceneObjects.Projectiles.Add(uid, new Projectile
         {
             Uid = uid,
             Direction = direction,
@@ -168,9 +191,9 @@ public class Main : MonoBehaviour
     private void TimerEnded()
     {
         synchronizationTime = 0.05f;
-        userModel.X = player.transform.position.x;
-        userModel.Z = player.transform.position.z;
-        connection.InvokeAsync("Synchronize", userModel.ConvertToServerPlayer());
+        SceneObjects.UserModel.X = player.transform.position.x;
+        SceneObjects.UserModel.Z = player.transform.position.z;
+        connection.InvokeAsync("Synchronize", SceneObjects.UserModel.ConvertToServerPlayer());
     }
 
     void OnDestroy()
@@ -194,13 +217,16 @@ public class Main : MonoBehaviour
         {
             player = GameObject.CreatePrimitive(PrimitiveType.Cube);
             player.transform.position = new Vector3(20, 1, 20);
-            player.AddComponent<CollisionDetector>();
+            player.name = userName;
             var rigidbody = player.AddComponent<Rigidbody>();
-            rigidbody.freezeRotation = true;
+            rigidbody.constraints = RigidbodyConstraints.FreezePositionY |
+                RigidbodyConstraints.FreezeRotationX |
+                RigidbodyConstraints.FreezeRotationY |
+                RigidbodyConstraints.FreezeRotationZ;
             var playerRenderer = player.GetComponent<Renderer>();
             playerRenderer.material.SetColor("_Color", UnityEngine.Random.ColorHSV());
-            userModel.Name = userName;
-            userModel.ConnectionId = connection.ConnectionId;
+            SceneObjects.UserModel.Name = userName;
+            SceneObjects.UserModel.ConnectionId = connection.ConnectionId;
 
             GameObject.Find("OkButton").SetActive(false);
             GameObject.Find("NameField").SetActive(false);
@@ -209,10 +235,10 @@ public class Main : MonoBehaviour
             userNameText.text = userName;
             userNameText.enabled = true;
             var healthText = GameObject.Find("Health").GetComponent<Text>();
-            healthText.text = userModel.Health.ToString();
+            healthText.text = SceneObjects.UserModel.Health.ToString();
             healthText.enabled = true;
             var invulnerableStatus = GameObject.Find("InvulnerableStatus").GetComponent<Text>();
-            invulnerableStatus.text = userModel.IsInvulnerable ? "Invulnerable" : string.Empty;
+            invulnerableStatus.text = SceneObjects.UserModel.IsInvulnerable ? "Invulnerable" : string.Empty;
             invulnerableStatus.enabled = true;
         }
     }
@@ -231,32 +257,34 @@ public class Main : MonoBehaviour
         {
             return;
         }
-        else if (!scenePlayers.ContainsKey(player.Name))
+        else if (!SceneObjects.ScenePlayers.ContainsKey(player.Name))
         {
-            scenePlayers.Add(player.Name, player.ConverToClientPlayer());
+            SceneObjects.ScenePlayers.Add(player.Name, player.ConverToClientPlayer());
             var newPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
             newPlayer.transform.position = new Vector3(player.X, 1, player.Z);
             newPlayer.name = player.Name;
             var newPlayerRenderer = newPlayer.GetComponent<Renderer>();
             newPlayerRenderer.material.SetColor("_Color", UnityEngine.Random.ColorHSV());
-            newPlayer.AddComponent<CollisionDetector>();
             var rigidbody = newPlayer.AddComponent<Rigidbody>();
-            rigidbody.freezeRotation = true;
+            rigidbody.constraints = RigidbodyConstraints.FreezePositionY | 
+                RigidbodyConstraints.FreezeRotationX | 
+                RigidbodyConstraints.FreezeRotationY | 
+                RigidbodyConstraints.FreezeRotationZ;
         }
         else
         {
-            scenePlayers[player.Name].X = player.X;
-            scenePlayers[player.Name].Z = player.Z;
-            scenePlayers[player.Name].Direction = player.Direction;
-            scenePlayers[player.Name].IsInvulnerable = player.IsInvulnerable;
-            scenePlayers[player.Name].Health = player.Health;
+            SceneObjects.ScenePlayers[player.Name].X = player.X;
+            SceneObjects.ScenePlayers[player.Name].Z = player.Z;
+            SceneObjects.ScenePlayers[player.Name].Direction = player.Direction;
+            SceneObjects.ScenePlayers[player.Name].IsInvulnerable = player.IsInvulnerable;
+            SceneObjects.ScenePlayers[player.Name].Health = player.Health;
         }
     }
 
     void RemoveUser(string name)
     {
         var player = GameObject.Find(name);
-        scenePlayers.Remove(name);
+        SceneObjects.ScenePlayers.Remove(name);
         player.SetActive(false);
     }
 }
