@@ -9,16 +9,16 @@ public class Main : MonoBehaviour
     private GameObject player;
 
     private float movementSpeed = 2;
-    private float timeModifier = 0.02f;
     private float synchronizationTime = 1.0f;
-    private float step;
+    private float fireCoolDownTime = 0.3f;
 
     private string userName = "";
-    private Player userModel = new Player();
+    private ClientPlayer userModel = new ClientPlayer();
 
     private HubConnection connection;
 
-    private Dictionary<string, Player> scenePlayers = new Dictionary<string, Player>();
+    private Dictionary<string, ClientPlayer> scenePlayers = new Dictionary<string, ClientPlayer>();
+    private List<Projectile> projectiles = new List<Projectile>();
 
     // Start is called before the first frame update
     void Start()
@@ -42,26 +42,44 @@ public class Main : MonoBehaviour
             .WithUrl("http://localhost:5000/userHub")
             .Build();
         connection.StartAsync();
-        connection.On<Player>("SendUser", x => ReceiveUser(x));
+        connection.On<ServerPlayer>("SendUser", x => ReceiveUser(x));
         connection.On<string>("RemoveUser", x => RemoveUser(x));
-        step = movementSpeed * timeModifier;
+        connection.On<float, float, Direction>("Shoot", (x, z, direction) => Shoot(x, z, direction));
     }
 
     void Update()
     {
+        var step = movementSpeed * Time.deltaTime;
         foreach (var scenePlayer in scenePlayers)
         {
             var oldPlayer = GameObject.Find(scenePlayer.Key);
             var destination = new Vector3(scenePlayer.Value.X, 1, scenePlayer.Value.Z);
             oldPlayer.transform.position = Vector3.MoveTowards(oldPlayer.transform.position, destination, step);
         }
+        foreach (var projectile in projectiles)
+        {
+            projectile.Move(Time.deltaTime);
+            if (projectile.IsOver)
+            {
+                GameObject.Destroy(projectile.ProjectileGameObject);
+            }
+        }
+        projectiles.RemoveAll(x => x.IsOver);
         if (player != null)
         {
             synchronizationTime -= Time.deltaTime;
 
             if (synchronizationTime <= 0.0f)
             {
-                timerEnded();
+                TimerEnded();
+            }
+            if (userModel.IsOnCoolDown)
+            {
+                fireCoolDownTime -= Time.deltaTime;
+                if (fireCoolDownTime <= 0.0f)
+                {
+                    userModel.IsOnCoolDown = false;
+                }
             }
             if (Input.GetButton("Horizontal"))
             {
@@ -70,11 +88,13 @@ public class Main : MonoBehaviour
                 {
                     var targetPosition = player.transform.position + Vector3.right * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                    userModel.Direction = Direction.Right;
                 }
                 else
                 {
                     var targetPosition = player.transform.position + Vector3.left * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                    userModel.Direction = Direction.Left;
                 }
             }
 
@@ -85,19 +105,41 @@ public class Main : MonoBehaviour
                 {
                     var targetPosition = player.transform.position + Vector3.forward * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                    userModel.Direction = Direction.Top;
                 }
                 else
                 {
                     var targetPosition = player.transform.position + Vector3.back * movementSpeed;
                     player.transform.position = Vector3.MoveTowards(player.transform.position, targetPosition, step);
+                    userModel.Direction = Direction.Bot;
                 }
+            }
+
+            if (Input.GetButton("Fire1") && !userModel.IsOnCoolDown)
+            {
+                connection.InvokeAsync("CreateProjectile", userModel.X, userModel.Z, userModel.Direction);
+                fireCoolDownTime = 0.3f;
+                userModel.IsOnCoolDown = true;
             }
         }
     }
 
-    private void timerEnded()
+    private void Shoot(float x, float z, Direction direction)
     {
-        synchronizationTime = 0.1f;
+        var projectileGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        var position = new Vector3(x, 1, z);
+        projectileGameObject.transform.position = position;
+
+        projectiles.Add(new Projectile
+        {
+            Direction = direction,
+            ProjectileGameObject = projectileGameObject
+        });
+    }
+
+    private void TimerEnded()
+    {
+        synchronizationTime = 0.05f;
         userModel.X = player.transform.position.x;
         userModel.Z = player.transform.position.z;
         connection.InvokeAsync("Synchronize", userModel);
@@ -145,7 +187,7 @@ public class Main : MonoBehaviour
         GameObject.Find("ErrorButton").SetActive(false);
     }
 
-    void ReceiveUser(Player player)
+    void ReceiveUser(ServerPlayer player)
     {
         if (player.Name == userName)
         {
@@ -153,7 +195,7 @@ public class Main : MonoBehaviour
         }
         else if (!scenePlayers.ContainsKey(player.Name))
         {
-            scenePlayers.Add(player.Name, new Player { Name = player.Name, X = player.X, Z = player.Z });
+            scenePlayers.Add(player.Name, player.ConverToClientPlayer());
             var newPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
             newPlayer.transform.position = new Vector3(player.X, 1, player.Z);
             newPlayer.name = player.Name;
@@ -162,9 +204,9 @@ public class Main : MonoBehaviour
         }
         else
         {
-            var oldPlayer = GameObject.Find(player.Name);
             scenePlayers[player.Name].X = player.X;
             scenePlayers[player.Name].Z = player.Z;
+            scenePlayers[player.Name].Direction = player.Direction;
         }
     }
 
