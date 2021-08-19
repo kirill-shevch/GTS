@@ -35,11 +35,13 @@ public class Main : MonoBehaviour
         var errorText = GameObject.Find("ErrorText").GetComponent<Text>();
         var healthText = GameObject.Find("Health").GetComponent<Text>();
         var userNameText = GameObject.Find("UserName").GetComponent<Text>();
+        var invulnerableStatus = GameObject.Find("InvulnerableStatus").GetComponent<Text>();
         loginButton.onClick.AddListener(OnLoginClick);
         errorButton.onClick.AddListener(OnErrorClick);
         errorText.enabled = false;
         healthText.enabled = false;
         userNameText.enabled = false;
+        invulnerableStatus.enabled = false;
         errorButtonObject.SetActive(false);
 
         connection = new HubConnectionBuilder()
@@ -76,6 +78,16 @@ public class Main : MonoBehaviour
             if (synchronizationTime <= 0.0f)
             {
                 TimerEnded();
+            }
+            if (userModel.IsInvulnerable)
+            {
+                userModel.InvulnerableTimer -= Time.deltaTime;
+                if (userModel.InvulnerableTimer <= 0.0f)
+                {
+                    userModel.IsInvulnerable = false;
+                    var invulnerableStatus = GameObject.Find("InvulnerableStatus").GetComponent<Text>();
+                    invulnerableStatus.text = string.Empty;
+                }
             }
             if (userModel.IsOnCoolDown)
             {
@@ -146,7 +158,7 @@ public class Main : MonoBehaviour
         synchronizationTime = 0.05f;
         userModel.X = player.transform.position.x;
         userModel.Z = player.transform.position.z;
-        connection.InvokeAsync("Synchronize", userModel);
+        connection.InvokeAsync("Synchronize", userModel.ConvertToServerPlayer());
     }
 
     void OnDestroy()
@@ -184,6 +196,9 @@ public class Main : MonoBehaviour
             var healthText = GameObject.Find("Health").GetComponent<Text>();
             healthText.text = userModel.Health.ToString();
             healthText.enabled = true;
+            var invulnerableStatus = GameObject.Find("InvulnerableStatus").GetComponent<Text>();
+            invulnerableStatus.text = userModel.IsInvulnerable ? "Invulnerable" : string.Empty;
+            invulnerableStatus.enabled = true;
         }
     }
 
@@ -215,6 +230,8 @@ public class Main : MonoBehaviour
             scenePlayers[player.Name].X = player.X;
             scenePlayers[player.Name].Z = player.Z;
             scenePlayers[player.Name].Direction = player.Direction;
+            scenePlayers[player.Name].IsInvulnerable = player.IsInvulnerable;
+            scenePlayers[player.Name].Health = player.Health;
         }
     }
 
