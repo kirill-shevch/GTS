@@ -8,6 +8,7 @@ namespace Assets.Models
         public float speed { get; set; } = 10;
         public float lifetime { get; set; } = 1.0f;
         public GameObject ProjectileGameObject { get; set; }
+        public string ShooterName { get; set; }
         public bool IsOver { get; set; } = false;
         public int Damage = 1;
 

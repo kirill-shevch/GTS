@@ -133,14 +133,14 @@ public class Main : MonoBehaviour
 
             if (Input.GetButton("Fire1") && !userModel.IsOnCoolDown)
             {
-                connection.InvokeAsync("CreateProjectile", userModel.X, userModel.Z, userModel.Direction);
+                connection.InvokeAsync("CreateProjectile", userModel.X, userModel.Z, userModel.Direction, userModel.Name);
                 fireCoolDownTime = 0.3f;
                 userModel.IsOnCoolDown = true;
             }
         }
     }
 
-    private void Shoot(float x, float z, Direction direction)
+    private void Shoot(float x, float z, Direction direction, string shooterName)
     {
         var projectileGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         var position = new Vector3(x, 1, z);
@@ -149,7 +149,8 @@ public class Main : MonoBehaviour
         projectiles.Add(new Projectile
         {
             Direction = direction,
-            ProjectileGameObject = projectileGameObject
+            ProjectileGameObject = projectileGameObject,
+            ShooterName = shooterName
         });
     }
 
