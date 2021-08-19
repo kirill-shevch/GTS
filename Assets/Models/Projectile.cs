@@ -4,17 +4,20 @@ namespace Assets.Models
 {
     public class Projectile
     {
+        public string Uid { get; set; }
         public Direction Direction { get; set; }
         public float speed { get; set; } = 10;
         public float lifetime { get; set; } = 1.0f;
         public GameObject ProjectileGameObject { get; set; }
+        public string ShooterName { get; set; }
         public bool IsOver { get; set; } = false;
+        public int Damage = 1;
 
         public void Move(float deltaTime)
         {
             var step = speed * deltaTime;
             lifetime -= deltaTime;
-            if (lifetime < 0.0f)
+            if (lifetime < 0.0f || IsOver)
             {
                 IsOver = true;
                 return;

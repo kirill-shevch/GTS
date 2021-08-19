@@ -7,5 +7,7 @@
         public float Z { get; set; } = 20;
         public string ConnectionId { get; set; }
         public Direction Direction { get; set; } = Direction.Top;
+        public int Health { get; set; } = 5;
+        public bool IsInvulnerable { get; set; } = true;
     }
 }
