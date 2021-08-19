@@ -4,6 +4,7 @@ namespace Assets.Models
 {
     public class Projectile
     {
+        public string Uid { get; set; }
         public Direction Direction { get; set; }
         public float speed { get; set; } = 10;
         public float lifetime { get; set; } = 1.0f;

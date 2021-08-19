@@ -1,5 +1,7 @@
-﻿using Assets.Models;
+﻿using Assets;
+using Assets.Models;
 using Microsoft.AspNetCore.SignalR.Client;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -50,7 +52,7 @@ public class Main : MonoBehaviour
         connection.StartAsync();
         connection.On<ServerPlayer>("SendUser", x => ReceiveUser(x));
         connection.On<string>("RemoveUser", x => RemoveUser(x));
-        connection.On<float, float, Direction>("Shoot", (x, z, direction) => Shoot(x, z, direction));
+        connection.On<float, float, Direction, string>("Shoot", (x, z, direction, shooterName) => Shoot(x, z, direction, shooterName));
     }
 
     void Update()
@@ -140,14 +142,23 @@ public class Main : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("Collision!");
+    }
+
     private void Shoot(float x, float z, Direction direction, string shooterName)
     {
         var projectileGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         var position = new Vector3(x, 1, z);
+        var uid = Guid.NewGuid().ToString();
         projectileGameObject.transform.position = position;
+        projectileGameObject.tag = "Projectile";
+        projectileGameObject.name = uid;
 
         projectiles.Add(new Projectile
         {
+            Uid = uid,
             Direction = direction,
             ProjectileGameObject = projectileGameObject,
             ShooterName = shooterName
@@ -183,8 +194,11 @@ public class Main : MonoBehaviour
         {
             player = GameObject.CreatePrimitive(PrimitiveType.Cube);
             player.transform.position = new Vector3(20, 1, 20);
+            player.AddComponent<CollisionDetector>();
+            var rigidbody = player.AddComponent<Rigidbody>();
+            rigidbody.freezeRotation = true;
             var playerRenderer = player.GetComponent<Renderer>();
-            playerRenderer.material.SetColor("_Color", Random.ColorHSV());
+            playerRenderer.material.SetColor("_Color", UnityEngine.Random.ColorHSV());
             userModel.Name = userName;
             userModel.ConnectionId = connection.ConnectionId;
 
@@ -224,7 +238,10 @@ public class Main : MonoBehaviour
             newPlayer.transform.position = new Vector3(player.X, 1, player.Z);
             newPlayer.name = player.Name;
             var newPlayerRenderer = newPlayer.GetComponent<Renderer>();
-            newPlayerRenderer.material.SetColor("_Color", Random.ColorHSV());
+            newPlayerRenderer.material.SetColor("_Color", UnityEngine.Random.ColorHSV());
+            newPlayer.AddComponent<CollisionDetector>();
+            var rigidbody = newPlayer.AddComponent<Rigidbody>();
+            rigidbody.freezeRotation = true;
         }
         else
         {
