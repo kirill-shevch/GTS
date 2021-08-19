@@ -9,6 +9,7 @@ namespace Assets.Models
         public float lifetime { get; set; } = 1.0f;
         public GameObject ProjectileGameObject { get; set; }
         public bool IsOver { get; set; } = false;
+        public int Damage = 1;
 
         public void Move(float deltaTime)
         {
