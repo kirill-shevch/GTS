@@ -1,5 +1,6 @@
 ﻿using Assets.Models;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets
 {
@@ -8,5 +9,6 @@ namespace Assets
         public static Dictionary<string, ClientPlayer> ScenePlayers = new Dictionary<string, ClientPlayer>();
         public static Dictionary<string, Projectile> Projectiles = new Dictionary<string, Projectile>();
         public static ClientPlayer UserModel = new ClientPlayer();
+        public static GameObject Player;
     }
 }
