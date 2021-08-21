@@ -63,7 +63,7 @@ namespace Assets
             }
             else
             {
-                SceneObjects.Player = UserFactory.CreateUser(userName, 20, 20);
+                SceneObjects.Player = UserFactory.CreateUser(userName, -10, -5);
                 SceneObjects.Player.AddComponent<UserScript>();
                 SceneObjects.UserModel.Name = userName;
                 SceneObjects.UserModel.ConnectionId = ServerHub.Connection.ConnectionId;
