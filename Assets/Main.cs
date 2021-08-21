@@ -14,12 +14,6 @@ public class Main : MonoBehaviour
     private float synchronizationTime = 1.0f;
     private float fireCoolDownTime = 0.3f;
 
-    private string userName = "";
-
-    private HubConnection connection;
-
-
-
     // Start is called before the first frame update
     void Start()
     {
@@ -43,14 +37,6 @@ public class Main : MonoBehaviour
         userNameText.enabled = false;
         invulnerableStatus.enabled = false;
         errorButtonObject.SetActive(false);
-
-        connection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5000/userHub")
-            .Build();
-        connection.StartAsync();
-        connection.On<ServerPlayer>("SendUser", x => ReceiveUser(x));
-        connection.On<string>("RemoveUser", x => RemoveUser(x));
-        connection.On<float, float, Direction, string>("Shoot", (x, z, direction, shooterName) => Shoot(x, z, direction, shooterName));
     }
 
     void Update()
@@ -135,9 +121,8 @@ public class Main : MonoBehaviour
 
             if (Input.GetButton("Fire1") && !SceneObjects.UserModel.IsOnCoolDown)
             {
-                connection.InvokeAsync("CreateProjectile", 
-                    SceneObjects.UserModel.X, 
-                    SceneObjects.UserModel.Z, 
+                ServerHub.CreateProjectile(SceneObjects.UserModel.X,
+                    SceneObjects.UserModel.Z,
                     SceneObjects.UserModel.Direction,
                     SceneObjects.UserModel.Name);
                 fireCoolDownTime = 0.3f;
@@ -146,60 +131,17 @@ public class Main : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log("Collision!");
-    }
-
-    private void Shoot(float x, float z, Direction direction, string shooterName)
-    {
-        var projectileGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        switch (direction)
-        {
-            case Direction.Top:
-                z++;
-                break;
-            case Direction.Bot:
-                z--;
-                break;
-            case Direction.Left:
-                x--;
-                break;
-            case Direction.Right:
-                x++;
-                break;
-            default:
-                break;
-        }
-        var position = new Vector3(x, 1, z);
-        var uid = Guid.NewGuid().ToString();
-        projectileGameObject.transform.position = position;
-        projectileGameObject.tag = "Projectile";
-        projectileGameObject.name = uid;
-        projectileGameObject.AddComponent<ProjectileCollisionDetector>();
-
-
-        SceneObjects.Projectiles.Add(uid, new Projectile
-        {
-            Uid = uid,
-            Direction = direction,
-            ProjectileGameObject = projectileGameObject,
-            ShooterName = shooterName
-        });
-    }
-
     private void TimerEnded()
     {
         synchronizationTime = 0.05f;
         SceneObjects.UserModel.X = player.transform.position.x;
         SceneObjects.UserModel.Z = player.transform.position.z;
-        connection.InvokeAsync("Synchronize", SceneObjects.UserModel.ConvertToServerPlayer());
+        ServerHub.Synchronize(SceneObjects.UserModel.ConvertToServerPlayer());
     }
 
     void OnDestroy()
     {
-        connection.InvokeAsync("RemoveUserName", userName);
-        connection.StopAsync();
+        ServerHub.CloseConnection();
     }
 
     void OnLoginClick()
@@ -226,11 +168,11 @@ public class Main : MonoBehaviour
             var playerRenderer = player.GetComponent<Renderer>();
             playerRenderer.material.SetColor("_Color", UnityEngine.Random.ColorHSV());
             SceneObjects.UserModel.Name = userName;
-            SceneObjects.UserModel.ConnectionId = connection.ConnectionId;
+            SceneObjects.UserModel.ConnectionId = ServerHub.Connection.ConnectionId;
 
             GameObject.Find("OkButton").SetActive(false);
             GameObject.Find("NameField").SetActive(false);
-            connection.InvokeAsync("AddUserName", userName, connection.ConnectionId);
+            ServerHub.AddUserName(userName);
             var userNameText = GameObject.Find("UserName").GetComponent<Text>();
             userNameText.text = userName;
             userNameText.enabled = true;
@@ -249,42 +191,5 @@ public class Main : MonoBehaviour
         GameObject.Find("NameField").SetActive(true);
         GameObject.Find("ErrorText").GetComponent<Text>().enabled = false;
         GameObject.Find("ErrorButton").SetActive(false);
-    }
-
-    void ReceiveUser(ServerPlayer player)
-    {
-        if (player.Name == userName)
-        {
-            return;
-        }
-        else if (!SceneObjects.ScenePlayers.ContainsKey(player.Name))
-        {
-            SceneObjects.ScenePlayers.Add(player.Name, player.ConverToClientPlayer());
-            var newPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            newPlayer.transform.position = new Vector3(player.X, 1, player.Z);
-            newPlayer.name = player.Name;
-            var newPlayerRenderer = newPlayer.GetComponent<Renderer>();
-            newPlayerRenderer.material.SetColor("_Color", UnityEngine.Random.ColorHSV());
-            var rigidbody = newPlayer.AddComponent<Rigidbody>();
-            rigidbody.constraints = RigidbodyConstraints.FreezePositionY | 
-                RigidbodyConstraints.FreezeRotationX | 
-                RigidbodyConstraints.FreezeRotationY | 
-                RigidbodyConstraints.FreezeRotationZ;
-        }
-        else
-        {
-            SceneObjects.ScenePlayers[player.Name].X = player.X;
-            SceneObjects.ScenePlayers[player.Name].Z = player.Z;
-            SceneObjects.ScenePlayers[player.Name].Direction = player.Direction;
-            SceneObjects.ScenePlayers[player.Name].IsInvulnerable = player.IsInvulnerable;
-            SceneObjects.ScenePlayers[player.Name].Health = player.Health;
-        }
-    }
-
-    void RemoveUser(string name)
-    {
-        var player = GameObject.Find(name);
-        SceneObjects.ScenePlayers.Remove(name);
-        player.SetActive(false);
     }
 }
