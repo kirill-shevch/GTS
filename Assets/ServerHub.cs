@@ -29,16 +29,7 @@ namespace Assets
             else if (!SceneObjects.ScenePlayers.ContainsKey(player.Name))
             {
                 SceneObjects.ScenePlayers.Add(player.Name, player.ConverToClientPlayer());
-                var newPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                newPlayer.transform.position = new Vector3(player.X, 1, player.Z);
-                newPlayer.name = player.Name;
-                var newPlayerRenderer = newPlayer.GetComponent<Renderer>();
-                newPlayerRenderer.material.SetColor("_Color", UnityEngine.Random.ColorHSV());
-                var rigidbody = newPlayer.AddComponent<Rigidbody>();
-                rigidbody.constraints = RigidbodyConstraints.FreezePositionY |
-                    RigidbodyConstraints.FreezeRotationX |
-                    RigidbodyConstraints.FreezeRotationY |
-                    RigidbodyConstraints.FreezeRotationZ;
+                var newPlayer = UserFactory.CreateUser(player.Name, player.X, player.Z);
             }
             else
             {

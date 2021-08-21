@@ -39,18 +39,17 @@ namespace Assets
                 GameObject.Find("ErrorText").GetComponent<Text>().enabled = true;
                 GameObject.Find("ErrorButton").SetActive(true);
             }
+            else if (SceneObjects.ScenePlayers.ContainsKey(userName))
+            {
+                GameObject.Find("OkButton").SetActive(false);
+                GameObject.Find("NameField").SetActive(false);
+                GameObject.Find("ErrorText").GetComponent<Text>().text = "User with this name is already exists!";
+                GameObject.Find("ErrorText").GetComponent<Text>().enabled = true;
+                GameObject.Find("ErrorButton").SetActive(true);
+            }
             else
             {
-                SceneObjects.Player = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                SceneObjects.Player.transform.position = new Vector3(20, 1, 20);
-                SceneObjects.Player.name = userName;
-                var rigidbody = SceneObjects.Player.AddComponent<Rigidbody>();
-                rigidbody.constraints = RigidbodyConstraints.FreezePositionY |
-                    RigidbodyConstraints.FreezeRotationX |
-                    RigidbodyConstraints.FreezeRotationY |
-                    RigidbodyConstraints.FreezeRotationZ;
-                var playerRenderer = SceneObjects.Player.GetComponent<Renderer>();
-                playerRenderer.material.SetColor("_Color", UnityEngine.Random.ColorHSV());
+                SceneObjects.Player = UserFactory.CreateUser(userName, 20, 20);
                 SceneObjects.UserModel.Name = userName;
                 SceneObjects.UserModel.ConnectionId = ServerHub.Connection.ConnectionId;
 
