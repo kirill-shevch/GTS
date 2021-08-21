@@ -14,7 +14,7 @@ namespace Assets
                 RigidbodyConstraints.FreezeRotationX |
                 RigidbodyConstraints.FreezeRotationY |
                 RigidbodyConstraints.FreezeRotationZ;
-            var playerRenderer = SceneObjects.Player.GetComponent<Renderer>();
+            var playerRenderer = player.GetComponent<Renderer>();
             playerRenderer.material.SetColor("_Color", UnityEngine.Random.ColorHSV());
             return player;
         }

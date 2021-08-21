@@ -5,64 +5,79 @@ namespace Assets
 {
     public static class UserInterfaceBehavior
     {
+        public static GameObject ErrorButton;
+        public static GameObject ErrorText;
+        public static GameObject LoginButton;
+        public static GameObject NameInput;
+        public static GameObject UserNameText;
+        public static GameObject HealthText;
+        public static GameObject InvulnerableStatusText;
+
         public static void Initialize()
         {
-            var loginButtonObject = GameObject.Find("OkButton");
-            loginButtonObject.GetComponentInChildren<Text>().text = "Ok";
-            var loginButton = loginButtonObject.GetComponent<Button>();
-            var nameFieldObject = GameObject.Find("NameField");
-            var nameField = nameFieldObject.GetComponent<InputField>();
-            var errorButtonObject = GameObject.Find("ErrorButton");
-            errorButtonObject.GetComponentInChildren<Text>().text = "Ok";
-            var errorButton = errorButtonObject.GetComponent<Button>();
-            var errorText = GameObject.Find("ErrorText").GetComponent<Text>();
-            var healthText = GameObject.Find("Health").GetComponent<Text>();
-            var userNameText = GameObject.Find("UserName").GetComponent<Text>();
-            var invulnerableStatus = GameObject.Find("InvulnerableStatus").GetComponent<Text>();
+            LoginButton = GameObject.Find("OkButton");
+            ErrorButton = GameObject.Find("ErrorButton");
+            ErrorText = GameObject.Find("ErrorText");
+            NameInput = GameObject.Find("NameField");
+            UserNameText = GameObject.Find("UserName");
+            HealthText = GameObject.Find("Health");
+            InvulnerableStatusText = GameObject.Find("InvulnerableStatus");
+
+
+            LoginButton.GetComponentInChildren<Text>().text = "Ok";
+            var loginButton = LoginButton.GetComponent<Button>();
+            var nameInput = NameInput.GetComponent<InputField>();
+            ErrorButton.GetComponentInChildren<Text>().text = "Ok";
+            var errorButton = ErrorButton.GetComponent<Button>();
+            var errorText = ErrorText.GetComponent<Text>();
+            var healthText = HealthText.GetComponent<Text>();
+            var userNameText = UserNameText.GetComponent<Text>();
+            var invulnerableStatus = InvulnerableStatusText.GetComponent<Text>();
             loginButton.onClick.AddListener(OnLoginClick);
             errorButton.onClick.AddListener(OnErrorClick);
             errorText.enabled = false;
             healthText.enabled = false;
             userNameText.enabled = false;
             invulnerableStatus.enabled = false;
-            errorButtonObject.SetActive(false);
+            ErrorButton.SetActive(false);
         }
 
         private static void OnLoginClick()
         {
-            var userName = GameObject.Find("NameField").GetComponent<InputField>().text;
+            var userName = NameInput.GetComponent<InputField>().text;
             if (string.IsNullOrWhiteSpace(userName))
             {
-                GameObject.Find("OkButton").SetActive(false);
-                GameObject.Find("NameField").SetActive(false);
-                GameObject.Find("ErrorText").GetComponent<Text>().text = "User name should not be empty!";
-                GameObject.Find("ErrorText").GetComponent<Text>().enabled = true;
-                GameObject.Find("ErrorButton").SetActive(true);
+                LoginButton.SetActive(false);
+                NameInput.SetActive(false);
+                ErrorText.GetComponent<Text>().text = "User name should not be empty!";
+                ErrorText.GetComponent<Text>().enabled = true;
+                ErrorButton.SetActive(true);
             }
             else if (SceneObjects.ScenePlayers.ContainsKey(userName))
             {
-                GameObject.Find("OkButton").SetActive(false);
-                GameObject.Find("NameField").SetActive(false);
-                GameObject.Find("ErrorText").GetComponent<Text>().text = "User with this name is already exists!";
-                GameObject.Find("ErrorText").GetComponent<Text>().enabled = true;
-                GameObject.Find("ErrorButton").SetActive(true);
+                LoginButton.SetActive(false);
+                NameInput.SetActive(false);
+                ErrorText.GetComponent<Text>().text = "User with this name is already exists!";
+                ErrorText.GetComponent<Text>().enabled = true;
+                ErrorButton.SetActive(true);
             }
             else
             {
                 SceneObjects.Player = UserFactory.CreateUser(userName, 20, 20);
+                SceneObjects.Player.AddComponent<UserScript>();
                 SceneObjects.UserModel.Name = userName;
                 SceneObjects.UserModel.ConnectionId = ServerHub.Connection.ConnectionId;
 
-                GameObject.Find("OkButton").SetActive(false);
-                GameObject.Find("NameField").SetActive(false);
+                LoginButton.SetActive(false);
+                NameInput.SetActive(false);
                 ServerHub.AddUserName(userName);
-                var userNameText = GameObject.Find("UserName").GetComponent<Text>();
+                var userNameText = UserNameText.GetComponent<Text>();
                 userNameText.text = userName;
                 userNameText.enabled = true;
-                var healthText = GameObject.Find("Health").GetComponent<Text>();
+                var healthText = HealthText.GetComponent<Text>();
                 healthText.text = SceneObjects.UserModel.Health.ToString();
                 healthText.enabled = true;
-                var invulnerableStatus = GameObject.Find("InvulnerableStatus").GetComponent<Text>();
+                var invulnerableStatus = InvulnerableStatusText.GetComponent<Text>();
                 invulnerableStatus.text = SceneObjects.UserModel.IsInvulnerable ? "Invulnerable" : string.Empty;
                 invulnerableStatus.enabled = true;
             }
@@ -70,10 +85,10 @@ namespace Assets
 
         private static void OnErrorClick()
         {
-            GameObject.Find("OkButton").SetActive(true);
-            GameObject.Find("NameField").SetActive(true);
-            GameObject.Find("ErrorText").GetComponent<Text>().enabled = false;
-            GameObject.Find("ErrorButton").SetActive(false);
+            LoginButton.SetActive(true);
+            NameInput.SetActive(true);
+            ErrorText.GetComponent<Text>().enabled = false;
+            ErrorButton.SetActive(false);
         }
     }
 }

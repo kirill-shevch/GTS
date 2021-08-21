@@ -9,7 +9,7 @@ namespace Assets
     {
         public static HubConnection Connection;
 
-        static ServerHub()
+        public static void Initialize()
         {
             Connection = new HubConnectionBuilder()
                 .WithUrl("http://localhost:5000/userHub")

@@ -22,10 +22,10 @@ namespace Assets
                     SceneObjects.UserModel.Health--;
                     SceneObjects.UserModel.InvulnerableTimer = 0.5f;
                     SceneObjects.UserModel.IsInvulnerable = true;
-                    var invulnerableStatus = GameObject.Find("InvulnerableStatus").GetComponent<Text>();
+                    var invulnerableStatus = UserInterfaceBehavior.InvulnerableStatusText.GetComponent<Text>();
                     invulnerableStatus.text = "Invulnerable";
                     projectile.IsOver = true;
-                    var healthText = GameObject.Find("Health").GetComponent<Text>();
+                    var healthText = UserInterfaceBehavior.HealthText.GetComponent<Text>();
                     healthText.text = SceneObjects.UserModel.Health.ToString();
                 }
             }
