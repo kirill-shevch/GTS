@@ -72,6 +72,7 @@ crashlytics-build.properties
 # Include dlls if they’re in the NuGet packages directory
 !/packages/*/lib/*.dll
 !/packages/*/lib/*/*.dll
+!/Assets/Plugins/*.dll
 # Include dlls if they're in the CommonReferences directory
 !*CommonReferences/*.dll
 ####################
@@ -130,7 +131,6 @@ packages
 NuGet.exe
 _[Ss]cripts
 *.exe
-*.dll
 *.nupkg
 *.ncrunchsolution
 *.dot[Cc]over
