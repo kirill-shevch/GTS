@@ -23,7 +23,7 @@ namespace Assets
                     if (SceneObjects.UserModel.Health == 0)
                     {
                         UserFactory.DeleteCurrentUser();
-                        UserInterfaceBehavior.ShowMessageText("You are dead! Not big surprise!");
+                        UserInterfaceBehavior.ShowMessageText("You are dead!");
                         return;
                     }
                     else

@@ -7,7 +7,7 @@ namespace Assets
     {
         public static void CreateCurrentUser()
         {
-            SceneObjects.Player = UserFactory.CreateUser(SceneObjects.UserModel.Name, -10, -5, true);
+            SceneObjects.Player = UserFactory.CreateUser(SceneObjects.UserModel.Name, -10, -8, true);
             SceneObjects.Player.AddComponent<UserScript>();
             ServerHub.AddUserName(SceneObjects.UserModel.Name);
             SceneObjects.UserModel.Health = 5;

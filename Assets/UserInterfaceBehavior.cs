@@ -32,6 +32,7 @@ namespace Assets
             var loginButton = LoginButton.GetComponent<Button>();
             var nameInput = NameInput.GetComponent<InputField>();
             ErrorButton.GetComponentInChildren<Text>().text = "Ok";
+            MessageButton.GetComponentInChildren<Text>().text = "Ok";
             var errorButton = ErrorButton.GetComponent<Button>();
             var messageButton = MessageButton.GetComponent<Button>();
             var errorText = ErrorText.GetComponent<Text>();

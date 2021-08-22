@@ -4,7 +4,7 @@
     {
         public string Name { get; set; }
         public float X { get; set; } = -10;
-        public float Z { get; set; } = -5;
+        public float Z { get; set; } = -8f;
         public string ConnectionId { get; set; }
         public Direction Direction { get; set; } = Direction.Top;
         public bool IsOnCoolDown { get; set; } = false;
