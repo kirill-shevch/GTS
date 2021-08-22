@@ -62,8 +62,7 @@ namespace Assets
                     }
                 }
             }
-
-            if (Input.GetButton("Vertical"))
+            else if (Input.GetButton("Vertical"))
             {
                 var varticalInput = Input.GetAxis("Vertical");
                 if (varticalInput > 0)

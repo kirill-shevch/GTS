@@ -1,9 +1,27 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets
 {
     public static class UserFactory
     {
+        public static void CreateCurrentUser()
+        {
+            SceneObjects.Player = UserFactory.CreateUser(SceneObjects.UserModel.Name, -10, -5, true);
+            SceneObjects.Player.AddComponent<UserScript>();
+            ServerHub.AddUserName(SceneObjects.UserModel.Name);
+            SceneObjects.UserModel.Health = 5;
+            SceneObjects.UserModel.IsInvulnerable = true;
+            SceneObjects.UserModel.InvulnerableTimer = 3;
+
+            var healthText = UserInterfaceBehavior.HealthText.GetComponent<Text>();
+            healthText.text = SceneObjects.UserModel.Health.ToString();
+            healthText.enabled = true;
+            var invulnerableStatus = UserInterfaceBehavior.InvulnerableStatusText.GetComponent<Text>();
+            invulnerableStatus.text = SceneObjects.UserModel.IsInvulnerable ? "Invulnerable" : string.Empty;
+            invulnerableStatus.enabled = true;
+        }
+
         public static GameObject CreateUser(string userName, float x, float z, bool isCurrentUser = false)
         {
             var player = (GameObject)(isCurrentUser ? GameObject.Instantiate(SceneObjects.TankBlueModel) : GameObject.Instantiate(SceneObjects.TankRedModel));
@@ -16,6 +34,12 @@ namespace Assets
                 RigidbodyConstraints.FreezeRotationZ;
             var collider = player.AddComponent<BoxCollider>();
             return player;
+        }
+
+        public static void DeleteCurrentUser()
+        {
+            ServerHub.Die();
+            GameObject.Destroy(SceneObjects.Player);
         }
     }
 }

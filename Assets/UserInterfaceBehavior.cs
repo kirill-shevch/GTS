@@ -12,6 +12,8 @@ namespace Assets
         public static GameObject UserNameText;
         public static GameObject HealthText;
         public static GameObject InvulnerableStatusText;
+        public static GameObject MessageText;
+        public static GameObject MessageButton;
 
         public static void Initialize()
         {
@@ -22,6 +24,8 @@ namespace Assets
             UserNameText = GameObject.Find("UserName");
             HealthText = GameObject.Find("Health");
             InvulnerableStatusText = GameObject.Find("InvulnerableStatus");
+            MessageText = GameObject.Find("MessageText");
+            MessageButton = GameObject.Find("MessageButton");
 
 
             LoginButton.GetComponentInChildren<Text>().text = "Ok";
@@ -29,17 +33,38 @@ namespace Assets
             var nameInput = NameInput.GetComponent<InputField>();
             ErrorButton.GetComponentInChildren<Text>().text = "Ok";
             var errorButton = ErrorButton.GetComponent<Button>();
+            var messageButton = MessageButton.GetComponent<Button>();
             var errorText = ErrorText.GetComponent<Text>();
             var healthText = HealthText.GetComponent<Text>();
             var userNameText = UserNameText.GetComponent<Text>();
             var invulnerableStatus = InvulnerableStatusText.GetComponent<Text>();
+            var messageText = MessageText.GetComponent<Text>();
             loginButton.onClick.AddListener(OnLoginClick);
             errorButton.onClick.AddListener(OnErrorClick);
+            messageButton.onClick.AddListener(OnMessageClick);
             errorText.enabled = false;
             healthText.enabled = false;
             userNameText.enabled = false;
+            messageText.enabled = false;
             invulnerableStatus.enabled = false;
             ErrorButton.SetActive(false);
+            MessageButton.SetActive(false);
+        }
+
+        public static void ShowMessageText(string message)
+        {
+            var messageText = MessageText.GetComponent<Text>();
+            messageText.text = message;
+            messageText.enabled = true;
+            MessageButton.SetActive(true);
+        }
+
+        public static void OnMessageClick()
+        {
+            UserFactory.CreateCurrentUser();
+            var messageText = MessageText.GetComponent<Text>();
+            messageText.enabled = false;
+            MessageButton.SetActive(false);
         }
 
         private static void OnLoginClick()
@@ -63,23 +88,16 @@ namespace Assets
             }
             else
             {
-                SceneObjects.Player = UserFactory.CreateUser(userName, -10, -5, true);
-                SceneObjects.Player.AddComponent<UserScript>();
                 SceneObjects.UserModel.Name = userName;
                 SceneObjects.UserModel.ConnectionId = ServerHub.Connection.ConnectionId;
 
+                UserFactory.CreateCurrentUser();
+
                 LoginButton.SetActive(false);
                 NameInput.SetActive(false);
-                ServerHub.AddUserName(userName);
                 var userNameText = UserNameText.GetComponent<Text>();
                 userNameText.text = userName;
                 userNameText.enabled = true;
-                var healthText = HealthText.GetComponent<Text>();
-                healthText.text = SceneObjects.UserModel.Health.ToString();
-                healthText.enabled = true;
-                var invulnerableStatus = InvulnerableStatusText.GetComponent<Text>();
-                invulnerableStatus.text = SceneObjects.UserModel.IsInvulnerable ? "Invulnerable" : string.Empty;
-                invulnerableStatus.enabled = true;
             }
         }
 

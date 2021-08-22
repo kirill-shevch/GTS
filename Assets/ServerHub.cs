@@ -45,7 +45,7 @@ namespace Assets
         {
             var player = GameObject.Find(name);
             SceneObjects.ScenePlayers.Remove(name);
-            player.SetActive(false);
+            GameObject.Destroy(player);
         }
 
         public static void Shoot(float x, float z, Direction direction, string shooterName)
@@ -102,6 +102,11 @@ namespace Assets
         public static void Synchronize(ServerPlayer player)
         {
             Connection.InvokeAsync("Synchronize", SceneObjects.UserModel.ConvertToServerPlayer());
+        }
+
+        public static void Die()
+        {
+            Connection.InvokeAsync("RemoveUserName", SceneObjects.UserModel.Name);
         }
 
         public static void CloseConnection()
