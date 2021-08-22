@@ -55,16 +55,20 @@ namespace Assets
             switch (direction)
             {
                 case Direction.Top:
-                    z++;
+                    z += 1.5f;
+                    projectileGameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
                     break;
                 case Direction.Bot:
-                    z--;
+                    z -= 1.5f;
+                    projectileGameObject.transform.rotation = Quaternion.Euler(0, 180, 0);
                     break;
                 case Direction.Left:
-                    x--;
+                    x -= 1.5f;
+                    projectileGameObject.transform.rotation = Quaternion.Euler(0, 270, 0);
                     break;
                 case Direction.Right:
-                    x++;
+                    x += 1.5f;
+                    projectileGameObject.transform.rotation = Quaternion.Euler(0, 90, 0);
                     break;
                 default:
                     break;

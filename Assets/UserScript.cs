@@ -45,13 +45,21 @@ namespace Assets
                 {
                     var targetPosition = SceneObjects.Player.transform.position + Vector3.right * movementSpeed;
                     SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
-                    SceneObjects.UserModel.Direction = Direction.Right;
+                    if (SceneObjects.UserModel.Direction != Direction.Right)
+                    {
+                        SceneObjects.Player.transform.rotation = Quaternion.Euler(0, 90, 0);
+                        SceneObjects.UserModel.Direction = Direction.Right;
+                    }
                 }
                 else
                 {
                     var targetPosition = SceneObjects.Player.transform.position + Vector3.left * movementSpeed;
                     SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
-                    SceneObjects.UserModel.Direction = Direction.Left;
+                    if (SceneObjects.UserModel.Direction != Direction.Left)
+                    {
+                        SceneObjects.Player.transform.rotation = Quaternion.Euler(0, 270, 0);
+                        SceneObjects.UserModel.Direction = Direction.Left;
+                    }
                 }
             }
 
@@ -62,13 +70,21 @@ namespace Assets
                 {
                     var targetPosition = SceneObjects.Player.transform.position + Vector3.forward * movementSpeed;
                     SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
-                    SceneObjects.UserModel.Direction = Direction.Top;
+                    if (SceneObjects.UserModel.Direction != Direction.Top)
+                    {
+                        SceneObjects.Player.transform.rotation = Quaternion.Euler(0, 0, 0);
+                        SceneObjects.UserModel.Direction = Direction.Top;
+                    }
                 }
                 else
                 {
                     var targetPosition = SceneObjects.Player.transform.position + Vector3.back * movementSpeed;
                     SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
-                    SceneObjects.UserModel.Direction = Direction.Bot;
+                    if (SceneObjects.UserModel.Direction != Direction.Bot)
+                    {
+                        SceneObjects.Player.transform.rotation = Quaternion.Euler(0, 180, 0);
+                        SceneObjects.UserModel.Direction = Direction.Bot;
+                    }
                 }
             }
 
