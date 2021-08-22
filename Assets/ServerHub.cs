@@ -29,7 +29,7 @@ namespace Assets
             else if (!SceneObjects.ScenePlayers.ContainsKey(player.Name))
             {
                 SceneObjects.ScenePlayers.Add(player.Name, player.ConverToClientPlayer());
-                var newPlayer = UserFactory.CreateUser(player.Name, player.X, player.Z);
+                UserFactory.CreateUser(player.Name, player.X, player.Z);
             }
             else
             {
@@ -45,25 +45,30 @@ namespace Assets
         {
             var player = GameObject.Find(name);
             SceneObjects.ScenePlayers.Remove(name);
-            player.SetActive(false);
+            GameObject.Destroy(player);
         }
 
         public static void Shoot(float x, float z, Direction direction, string shooterName)
         {
-            var projectileGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            var projectileGameObject = (GameObject)GameObject.Instantiate(SceneObjects.ProjectileModel);
+            var collider = projectileGameObject.AddComponent<BoxCollider>();
             switch (direction)
             {
                 case Direction.Top:
-                    z++;
+                    z += 1.5f;
+                    projectileGameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
                     break;
                 case Direction.Bot:
-                    z--;
+                    z -= 1.5f;
+                    projectileGameObject.transform.rotation = Quaternion.Euler(0, 180, 0);
                     break;
                 case Direction.Left:
-                    x--;
+                    x -= 1.5f;
+                    projectileGameObject.transform.rotation = Quaternion.Euler(0, 270, 0);
                     break;
                 case Direction.Right:
-                    x++;
+                    x += 1.5f;
+                    projectileGameObject.transform.rotation = Quaternion.Euler(0, 90, 0);
                     break;
                 default:
                     break;
@@ -97,6 +102,11 @@ namespace Assets
         public static void Synchronize(ServerPlayer player)
         {
             Connection.InvokeAsync("Synchronize", SceneObjects.UserModel.ConvertToServerPlayer());
+        }
+
+        public static void Die()
+        {
+            Connection.InvokeAsync("RemoveUserName", SceneObjects.UserModel.Name);
         }
 
         public static void CloseConnection()

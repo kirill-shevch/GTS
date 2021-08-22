@@ -20,10 +20,19 @@ namespace Assets
                     !SceneObjects.UserModel.IsInvulnerable)
                 {
                     SceneObjects.UserModel.Health--;
-                    SceneObjects.UserModel.InvulnerableTimer = 0.5f;
-                    SceneObjects.UserModel.IsInvulnerable = true;
-                    var invulnerableStatus = UserInterfaceBehavior.InvulnerableStatusText.GetComponent<Text>();
-                    invulnerableStatus.text = "Invulnerable";
+                    if (SceneObjects.UserModel.Health == 0)
+                    {
+                        UserFactory.DeleteCurrentUser();
+                        UserInterfaceBehavior.ShowMessageText("You are dead!");
+                        return;
+                    }
+                    else
+                    {
+                        SceneObjects.UserModel.InvulnerableTimer = 0.5f;
+                        SceneObjects.UserModel.IsInvulnerable = true;
+                        var invulnerableStatus = UserInterfaceBehavior.InvulnerableStatusText.GetComponent<Text>();
+                        invulnerableStatus.text = "Invulnerable";
+                    }
                     projectile.IsOver = true;
                     var healthText = UserInterfaceBehavior.HealthText.GetComponent<Text>();
                     healthText.text = SceneObjects.UserModel.Health.ToString();

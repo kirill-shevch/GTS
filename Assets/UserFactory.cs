@@ -1,12 +1,30 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets
 {
     public static class UserFactory
     {
-        public static GameObject CreateUser(string userName, float x, float z)
+        public static void CreateCurrentUser()
         {
-            var player = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            SceneObjects.Player = UserFactory.CreateUser(SceneObjects.UserModel.Name, -10, -8, true);
+            SceneObjects.Player.AddComponent<UserScript>();
+            ServerHub.AddUserName(SceneObjects.UserModel.Name);
+            SceneObjects.UserModel.Health = 5;
+            SceneObjects.UserModel.IsInvulnerable = true;
+            SceneObjects.UserModel.InvulnerableTimer = 3;
+
+            var healthText = UserInterfaceBehavior.HealthText.GetComponent<Text>();
+            healthText.text = SceneObjects.UserModel.Health.ToString();
+            healthText.enabled = true;
+            var invulnerableStatus = UserInterfaceBehavior.InvulnerableStatusText.GetComponent<Text>();
+            invulnerableStatus.text = SceneObjects.UserModel.IsInvulnerable ? "Invulnerable" : string.Empty;
+            invulnerableStatus.enabled = true;
+        }
+
+        public static GameObject CreateUser(string userName, float x, float z, bool isCurrentUser = false)
+        {
+            var player = (GameObject)(isCurrentUser ? GameObject.Instantiate(SceneObjects.TankBlueModel) : GameObject.Instantiate(SceneObjects.TankRedModel));
             player.transform.position = new Vector3(x, 1, z);
             player.name = userName;
             var rigidbody = player.AddComponent<Rigidbody>();
@@ -14,9 +32,14 @@ namespace Assets
                 RigidbodyConstraints.FreezeRotationX |
                 RigidbodyConstraints.FreezeRotationY |
                 RigidbodyConstraints.FreezeRotationZ;
-            var playerRenderer = player.GetComponent<Renderer>();
-            playerRenderer.material.SetColor("_Color", UnityEngine.Random.ColorHSV());
+            var collider = player.AddComponent<BoxCollider>();
             return player;
+        }
+
+        public static void DeleteCurrentUser()
+        {
+            ServerHub.Die();
+            GameObject.Destroy(SceneObjects.Player);
         }
     }
 }

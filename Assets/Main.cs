@@ -11,7 +11,8 @@ public class Main : MonoBehaviour
     {
         ServerHub.Initialize();
         UserInterfaceBehavior.Initialize();
-        Screen.SetResolution(640, 480, false);
+        SceneObjects.Initialize();
+        Screen.SetResolution(750, 600, false);
     }
 
     void Update()
@@ -21,6 +22,23 @@ public class Main : MonoBehaviour
         {
             var oldPlayer = GameObject.Find(scenePlayer.Key);
             var destination = new Vector3(scenePlayer.Value.X, 1, scenePlayer.Value.Z);
+            switch (scenePlayer.Value.Direction)
+            {
+                case Assets.Models.Direction.Top:
+                    oldPlayer.transform.rotation = Quaternion.Euler(0, 0, 0);
+                    break;
+                case Assets.Models.Direction.Bot:
+                    oldPlayer.transform.rotation = Quaternion.Euler(0, 180, 0);
+                    break;
+                case Assets.Models.Direction.Left:
+                    oldPlayer.transform.rotation = Quaternion.Euler(0, 270, 0);
+                    break;
+                case Assets.Models.Direction.Right:
+                    oldPlayer.transform.rotation = Quaternion.Euler(0, 90, 0);
+                    break;
+                default:
+                    break;
+            }
             oldPlayer.transform.position = Vector3.MoveTowards(oldPlayer.transform.position, destination, step);
         }
         var uidsToDelete = new List<string>();
