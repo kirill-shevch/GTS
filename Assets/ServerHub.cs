@@ -29,7 +29,7 @@ namespace Assets
             else if (!SceneObjects.ScenePlayers.ContainsKey(player.Name))
             {
                 SceneObjects.ScenePlayers.Add(player.Name, player.ConverToClientPlayer());
-                var newPlayer = UserFactory.CreateUser(player.Name, player.X, player.Z);
+                UserFactory.CreateUser(player.Name, player.X, player.Z);
             }
             else
             {
@@ -50,7 +50,7 @@ namespace Assets
 
         public static void Shoot(float x, float z, Direction direction, string shooterName)
         {
-            var projectileGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            var projectileGameObject = (GameObject)GameObject.Instantiate(SceneObjects.ProjectileModel);
             switch (direction)
             {
                 case Direction.Top:
