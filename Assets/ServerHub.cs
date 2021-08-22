@@ -51,6 +51,7 @@ namespace Assets
         public static void Shoot(float x, float z, Direction direction, string shooterName)
         {
             var projectileGameObject = (GameObject)GameObject.Instantiate(SceneObjects.ProjectileModel);
+            var collider = projectileGameObject.AddComponent<BoxCollider>();
             switch (direction)
             {
                 case Direction.Top:

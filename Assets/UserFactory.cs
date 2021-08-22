@@ -14,6 +14,7 @@ namespace Assets
                 RigidbodyConstraints.FreezeRotationX |
                 RigidbodyConstraints.FreezeRotationY |
                 RigidbodyConstraints.FreezeRotationZ;
+            var collider = player.AddComponent<BoxCollider>();
             return player;
         }
     }
