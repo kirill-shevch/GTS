@@ -14,6 +14,7 @@ namespace Assets
         public static GameObject InvulnerableStatusText;
         public static GameObject MessageText;
         public static GameObject MessageButton;
+        public static GameObject UserNamePanel;
 
         public static void Initialize()
         {
@@ -26,6 +27,7 @@ namespace Assets
             InvulnerableStatusText = GameObject.Find("InvulnerableStatus");
             MessageText = GameObject.Find("MessageText");
             MessageButton = GameObject.Find("MessageButton");
+            UserNamePanel = GameObject.Find("UserNamePanel");
 
 
             LoginButton.GetComponentInChildren<Text>().text = "Ok";
@@ -50,6 +52,7 @@ namespace Assets
             invulnerableStatus.enabled = false;
             ErrorButton.SetActive(false);
             MessageButton.SetActive(false);
+            UserNamePanel.SetActive(false);
         }
 
         public static void ShowMessageText(string message)
@@ -96,6 +99,7 @@ namespace Assets
 
                 LoginButton.SetActive(false);
                 NameInput.SetActive(false);
+                UserNamePanel.SetActive(true);
                 var userNameText = UserNameText.GetComponent<Text>();
                 userNameText.text = userName;
                 userNameText.enabled = true;
