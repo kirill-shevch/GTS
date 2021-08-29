@@ -51,6 +51,11 @@ namespace Assets
         public static void Shoot(float x, float z, Direction direction, string shooterName)
         {
             var projectileGameObject = (GameObject)GameObject.Instantiate(SceneObjects.ProjectileModel);
+            var rigidbody = projectileGameObject.AddComponent<Rigidbody>();
+            rigidbody.constraints = RigidbodyConstraints.FreezePositionY |
+                RigidbodyConstraints.FreezeRotationX |
+                RigidbodyConstraints.FreezeRotationY |
+                RigidbodyConstraints.FreezeRotationZ;
             var collider = projectileGameObject.AddComponent<BoxCollider>();
             switch (direction)
             {
