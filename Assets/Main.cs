@@ -1,4 +1,5 @@
 ﻿using Assets;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,7 +22,17 @@ public class Main : MonoBehaviour
         foreach (var scenePlayer in SceneObjects.ScenePlayers)
         {
             var oldPlayer = GameObject.Find(scenePlayer.Key);
-            var destination = new Vector3(scenePlayer.Value.X, 1, scenePlayer.Value.Z);
+            Vector3 destination;
+            var xDiff = Math.Abs(oldPlayer.transform.position.x - scenePlayer.Value.X);
+            var zDiff = Math.Abs(oldPlayer.transform.position.z - scenePlayer.Value.Z);
+            if (xDiff > zDiff)
+            {
+                destination = new Vector3(scenePlayer.Value.X, 1, oldPlayer.transform.position.z);
+            }
+            else
+            {
+                destination = new Vector3(oldPlayer.transform.position.x, 1, scenePlayer.Value.Z);
+            }
             switch (scenePlayer.Value.Direction)
             {
                 case Assets.Models.Direction.Top:

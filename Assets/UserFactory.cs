@@ -33,6 +33,7 @@ namespace Assets
                 RigidbodyConstraints.FreezeRotationY |
                 RigidbodyConstraints.FreezeRotationZ;
             var collider = player.AddComponent<BoxCollider>();
+            rigidbody.drag = 5;
             return player;
         }
 
