@@ -59,10 +59,13 @@ namespace LoneLabWebApp.Services.Hubs
 
         public async Task RemoveUserName(string userName)
         {
-            _players.Remove(userName);
-            _kdTable.Remove(userName);
-            await RemoveUser(userName);
-            await Clients?.All.SendAsync("BroadcastKDTable", _kdTable);
+            if (!string.IsNullOrEmpty(userName))
+            {
+                _players.Remove(userName);
+                _kdTable.Remove(userName);
+                await RemoveUser(userName);
+                await Clients?.All.SendAsync("BroadcastKDTable", _kdTable);
+            }
         }
 
         public async Task Synchronize(ServerPlayer player)

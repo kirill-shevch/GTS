@@ -15,7 +15,9 @@ namespace Assets
         public static GameObject MessageButton;
         public static GameObject UserNamePanel;
         public static GameObject MoneyPanel;
-        public static GameObject MoneyAmountText;
+        public static GameObject MoneyAmountText;        
+        public static GameObject KillDeathPanel;
+        public static GameObject KillDeathListText;
 
         public static void Initialize()
         {
@@ -30,6 +32,8 @@ namespace Assets
             UserNamePanel = GameObject.Find("UserNamePanel");
             MoneyPanel = GameObject.Find("MoneyPanel");
             MoneyAmountText = GameObject.Find("MoneyAmountText");
+            KillDeathPanel = GameObject.Find("KillDeathPanel");
+            KillDeathListText = GameObject.Find("KillDeathListText");
 
 
             LoginButton.GetComponentInChildren<Text>().text = "Ok";
@@ -44,6 +48,7 @@ namespace Assets
             var moneyAmountText = MoneyAmountText.GetComponent<Text>();
             var userNameText = UserNameText.GetComponent<Text>();
             var messageText = MessageText.GetComponent<Text>();
+            var killDeathListText = KillDeathListText.GetComponent<Text>();
             loginButton.onClick.AddListener(OnLoginClick);
             errorButton.onClick.AddListener(OnErrorClick);
             messageButton.onClick.AddListener(OnMessageClick);
@@ -51,9 +56,11 @@ namespace Assets
             healthText.enabled = false;
             userNameText.enabled = false;
             messageText.enabled = false;
+            killDeathListText.enabled = false;
             ErrorButton.SetActive(false);
             MessageButton.SetActive(false);
             UserNamePanel.SetActive(false);
+            KillDeathPanel.SetActive(false);
             nameInput.text = PlayerPrefs.GetString("UserName", string.Empty);
             moneyAmountText.text = PlayerPrefs.GetInt("MoneyAmount", 0).ToString();
         }
@@ -103,9 +110,12 @@ namespace Assets
                 LoginButton.SetActive(false);
                 NameInput.SetActive(false);
                 UserNamePanel.SetActive(true);
+                KillDeathPanel.SetActive(true);
+                var killDeathListText = KillDeathListText.GetComponent<Text>();
                 var userNameText = UserNameText.GetComponent<Text>();
                 userNameText.text = userName;
                 userNameText.enabled = true;
+                killDeathListText.enabled = true;
                 PlayerPrefs.SetString("UserName", userName);
             }
         }

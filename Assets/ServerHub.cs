@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -131,11 +133,18 @@ namespace Assets
 
         public static void ReceiveKDTable(Dictionary<string, KillDeathAmount> kDTable)
         {
-            Debug.Log("KD table:");
-            foreach (var item in kDTable)
+            var killDeathListText = UserInterfaceBehavior.KillDeathListText.GetComponent<Text>();
+            var result = new StringBuilder();
+            foreach (var item in kDTable.OrderByDescending(x => x.Value.Kills).Take(10))
             {
-                Debug.Log($"User {item.Key}, Kills: {item.Value.Kills}, Deathes: {item.Value.Deathes}");
+                result.Append(item.Key);
+                result.Append(": Kills-");
+                result.Append(item.Value.Kills);
+                result.Append("  Deathes-");
+                result.Append(item.Value.Deathes);
+                result.Append("\n");
             }
+            killDeathListText.text = result.ToString();
         }
 
         public static void CloseConnection()
