@@ -8,7 +8,7 @@ namespace LoneLabWebApp.Services.Hubs
     public class UserHub : Hub
     {
         private Dictionary<string, ServerPlayer> _players = new Dictionary<string, ServerPlayer>();
-        private Dictionary<string, KillDeathAmount> KDTable = new Dictionary<string, KillDeathAmount>();
+        private Dictionary<string, KillDeathAmount> _kdTable = new Dictionary<string, KillDeathAmount>();
 
         public UserHub()
         {
@@ -16,31 +16,40 @@ namespace LoneLabWebApp.Services.Hubs
 
         public async Task AddUserName(string userName, string connectionId)
         {
-            _players.Add(userName, new ServerPlayer
+            if (!_players.ContainsKey(userName))
             {
-                Name = userName,
-                ConnectionId = connectionId
-            });
-            KDTable.Add(userName, new KillDeathAmount());
+                _players.Add(userName, new ServerPlayer
+                {
+                    Name = userName,
+                    ConnectionId = connectionId
+                });
+            }
+            if (!_kdTable.ContainsKey(userName))
+            {
+                _kdTable.Add(userName, new KillDeathAmount());
+            }
             await SendUser(_players[userName]);
+            await BroadcastKDTable();
         }
 
         public async Task IncrementKill(string userName)
         {
-            KDTable[userName].Kills++;
+            _kdTable[userName].Kills++;
             await SendMoney(userName);
             await BroadcastKDTable();
         }        
         
         public async Task IncrementDeath(string userName)
         {
-            KDTable[userName].Deathes++;
+            _kdTable[userName].Deathes++;
+            _players[userName].RegenerateCoordinates();
             await BroadcastKDTable();
+            await RemoveUser(userName);
         }
 
         public async Task BroadcastKDTable()
         {
-            await Clients?.All.SendAsync("BroadcastKDTable", KDTable);
+            await Clients?.All.SendAsync("BroadcastKDTable", _kdTable);
         }
 
         public async Task SendMoney(string userName)
@@ -51,9 +60,9 @@ namespace LoneLabWebApp.Services.Hubs
         public async Task RemoveUserName(string userName)
         {
             _players.Remove(userName);
-            KDTable.Remove(userName);
+            _kdTable.Remove(userName);
             await RemoveUser(userName);
-            await Clients?.All.SendAsync("BroadcastKDTable", KDTable);
+            await Clients?.All.SendAsync("BroadcastKDTable", _kdTable);
         }
 
         public async Task Synchronize(ServerPlayer player)
