@@ -8,6 +8,7 @@ namespace LoneLabWebApp.Services.Hubs
     public class UserHub : Hub
     {
         private Dictionary<string, ServerPlayer> _players = new Dictionary<string, ServerPlayer>();
+        private Dictionary<string, KillDeathAmount> KDTable = new Dictionary<string, KillDeathAmount>();
 
         public UserHub()
         {
@@ -20,13 +21,39 @@ namespace LoneLabWebApp.Services.Hubs
                 Name = userName,
                 ConnectionId = connectionId
             });
+            KDTable.Add(userName, new KillDeathAmount());
             await SendUser(_players[userName]);
+        }
+
+        public async Task IncrementKill(string userName, string killerName)
+        {
+            KDTable[userName].Kills++;
+            await SendMoney(killerName);
+            await BroadcastKDTable();
+        }        
+        
+        public async Task IncrementDeath(string userName)
+        {
+            KDTable[userName].Deathes++;
+            await BroadcastKDTable();
+        }
+
+        public async Task BroadcastKDTable()
+        {
+            await Clients?.All.SendAsync("BroadcastKDTable", KDTable);
+        }
+
+        public async Task SendMoney(string userName)
+        {
+            await Clients?.Client(_players[userName].ConnectionId).SendAsync("Getmoney");
         }
 
         public async Task RemoveUserName(string userName)
         {
             _players.Remove(userName);
+            KDTable.Remove(userName);
             await RemoveUser(userName);
+            await Clients?.All.SendAsync("BroadcastKDTable", KDTable);
         }
 
         public async Task Synchronize(ServerPlayer player)
