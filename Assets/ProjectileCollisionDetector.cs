@@ -23,6 +23,7 @@ namespace Assets
                     if (SceneObjects.UserModel.Health == 0)
                     {
                         UserFactory.DeleteCurrentUser();
+                        ServerHub.Kill(projectile.ShooterName);
                         UserInterfaceBehavior.ShowMessageText("You are dead!");
                         return;
                     }

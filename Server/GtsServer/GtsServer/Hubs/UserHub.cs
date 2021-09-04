@@ -25,10 +25,10 @@ namespace LoneLabWebApp.Services.Hubs
             await SendUser(_players[userName]);
         }
 
-        public async Task IncrementKill(string userName, string killerName)
+        public async Task IncrementKill(string userName)
         {
             KDTable[userName].Kills++;
-            await SendMoney(killerName);
+            await SendMoney(userName);
             await BroadcastKDTable();
         }        
         
@@ -45,7 +45,7 @@ namespace LoneLabWebApp.Services.Hubs
 
         public async Task SendMoney(string userName)
         {
-            await Clients?.Client(_players[userName].ConnectionId).SendAsync("Getmoney");
+            await Clients?.Client(_players[userName].ConnectionId).SendAsync("GetMoney");
         }
 
         public async Task RemoveUserName(string userName)

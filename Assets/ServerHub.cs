@@ -1,6 +1,7 @@
 ﻿using Assets.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets
@@ -18,6 +19,8 @@ namespace Assets
             Connection.On<ServerPlayer>("SendUser", x => ReceiveUser(x));
             Connection.On<string>("RemoveUser", x => RemoveUser(x));
             Connection.On<float, float, Direction, string>("Shoot", (x, z, direction, shooterName) => Shoot(x, z, direction, shooterName));
+            Connection.On("GetMoney", () => GetMoney());
+            Connection.On<Dictionary<string, KillDeathAmount>>("BroadcastKDTable", kDTable => ReceiveKDTable(kDTable));
         }
 
         public static void ReceiveUser(ServerPlayer player)
@@ -111,7 +114,26 @@ namespace Assets
 
         public static void Die()
         {
-            Connection.InvokeAsync("RemoveUserName", SceneObjects.UserModel.Name);
+            Connection.InvokeAsync("IncrementDeath", SceneObjects.UserModel.Name);
+        }
+
+        public static void Kill(string killerName)
+        {
+            Connection.InvokeAsync("IncrementKill", killerName);
+        }
+
+        public static void GetMoney()
+        {
+            SceneObjects.UserModel.MoneyAmount++;
+        }
+
+        public static void ReceiveKDTable(Dictionary<string, KillDeathAmount> kDTable)
+        {
+            Debug.Log("KD table:");
+            foreach (var item in kDTable)
+            {
+                Debug.Log($"User {item.Key}, Kills: {item.Value.Kills}, Deathes: {item.Value.Deathes}");
+            }
         }
 
         public static void CloseConnection()

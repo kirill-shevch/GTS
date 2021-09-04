@@ -38,7 +38,7 @@ namespace Assets
             return player;
         }
 
-        public static void DeleteCurrentUser(string killerName)
+        public static void DeleteCurrentUser()
         {
             ServerHub.Die();
             GameObject.Destroy(SceneObjects.Player);
