@@ -11,10 +11,13 @@ namespace Assets
         public static GameObject NameInput;
         public static GameObject UserNameText;
         public static GameObject HealthText;
-        public static GameObject InvulnerableStatusText;
         public static GameObject MessageText;
         public static GameObject MessageButton;
         public static GameObject UserNamePanel;
+        public static GameObject MoneyPanel;
+        public static GameObject MoneyAmountText;        
+        public static GameObject KillDeathPanel;
+        public static GameObject KillDeathListText;
 
         public static void Initialize()
         {
@@ -24,10 +27,13 @@ namespace Assets
             NameInput = GameObject.Find("NameField");
             UserNameText = GameObject.Find("UserName");
             HealthText = GameObject.Find("Health");
-            InvulnerableStatusText = GameObject.Find("InvulnerableStatus");
             MessageText = GameObject.Find("MessageText");
             MessageButton = GameObject.Find("MessageButton");
             UserNamePanel = GameObject.Find("UserNamePanel");
+            MoneyPanel = GameObject.Find("MoneyPanel");
+            MoneyAmountText = GameObject.Find("MoneyAmountText");
+            KillDeathPanel = GameObject.Find("KillDeathPanel");
+            KillDeathListText = GameObject.Find("KillDeathListText");
 
 
             LoginButton.GetComponentInChildren<Text>().text = "Ok";
@@ -39,9 +45,10 @@ namespace Assets
             var messageButton = MessageButton.GetComponent<Button>();
             var errorText = ErrorText.GetComponent<Text>();
             var healthText = HealthText.GetComponent<Text>();
+            var moneyAmountText = MoneyAmountText.GetComponent<Text>();
             var userNameText = UserNameText.GetComponent<Text>();
-            var invulnerableStatus = InvulnerableStatusText.GetComponent<Text>();
             var messageText = MessageText.GetComponent<Text>();
+            var killDeathListText = KillDeathListText.GetComponent<Text>();
             loginButton.onClick.AddListener(OnLoginClick);
             errorButton.onClick.AddListener(OnErrorClick);
             messageButton.onClick.AddListener(OnMessageClick);
@@ -49,10 +56,13 @@ namespace Assets
             healthText.enabled = false;
             userNameText.enabled = false;
             messageText.enabled = false;
-            invulnerableStatus.enabled = false;
+            killDeathListText.enabled = false;
             ErrorButton.SetActive(false);
             MessageButton.SetActive(false);
             UserNamePanel.SetActive(false);
+            KillDeathPanel.SetActive(false);
+            nameInput.text = PlayerPrefs.GetString("UserName", string.Empty);
+            moneyAmountText.text = PlayerPrefs.GetInt("MoneyAmount", 0).ToString();
         }
 
         public static void ShowMessageText(string message)
@@ -100,9 +110,13 @@ namespace Assets
                 LoginButton.SetActive(false);
                 NameInput.SetActive(false);
                 UserNamePanel.SetActive(true);
+                KillDeathPanel.SetActive(true);
+                var killDeathListText = KillDeathListText.GetComponent<Text>();
                 var userNameText = UserNameText.GetComponent<Text>();
                 userNameText.text = userName;
                 userNameText.enabled = true;
+                killDeathListText.enabled = true;
+                PlayerPrefs.SetString("UserName", userName);
             }
         }
 

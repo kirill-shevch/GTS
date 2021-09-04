@@ -1,7 +1,11 @@
 ﻿using Assets.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets
 {
@@ -18,6 +22,8 @@ namespace Assets
             Connection.On<ServerPlayer>("SendUser", x => ReceiveUser(x));
             Connection.On<string>("RemoveUser", x => RemoveUser(x));
             Connection.On<float, float, Direction, string>("Shoot", (x, z, direction, shooterName) => Shoot(x, z, direction, shooterName));
+            Connection.On("GetMoney", () => GetMoney());
+            Connection.On<Dictionary<string, KillDeathAmount>>("BroadcastKDTable", kDTable => ReceiveKDTable(kDTable));
         }
 
         public static void ReceiveUser(ServerPlayer player)
@@ -111,7 +117,34 @@ namespace Assets
 
         public static void Die()
         {
-            Connection.InvokeAsync("RemoveUserName", SceneObjects.UserModel.Name);
+            Connection.InvokeAsync("IncrementDeath", SceneObjects.UserModel.Name);
+        }
+
+        public static void Kill(string killerName)
+        {
+            Connection.InvokeAsync("IncrementKill", killerName);
+        }
+
+        public static void GetMoney()
+        {
+            SceneObjects.UserModel.MoneyAmount++;
+            UserInterfaceBehavior.MoneyAmountText.GetComponent<Text>().text = SceneObjects.UserModel.MoneyAmount.ToString();
+        }
+
+        public static void ReceiveKDTable(Dictionary<string, KillDeathAmount> kDTable)
+        {
+            var killDeathListText = UserInterfaceBehavior.KillDeathListText.GetComponent<Text>();
+            var result = new StringBuilder();
+            foreach (var item in kDTable.OrderByDescending(x => x.Value.Kills).Take(10))
+            {
+                result.Append(item.Key);
+                result.Append(": Kills-");
+                result.Append(item.Value.Kills);
+                result.Append("  Deathes-");
+                result.Append(item.Value.Deathes);
+                result.Append("\n");
+            }
+            killDeathListText.text = result.ToString();
         }
 
         public static void CloseConnection()

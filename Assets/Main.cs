@@ -68,5 +68,6 @@ public class Main : MonoBehaviour
     void OnDestroy()
     {
         ServerHub.CloseConnection();
+        PlayerPrefs.SetInt("MoneyAmount", SceneObjects.UserModel.MoneyAmount);
     }
 }

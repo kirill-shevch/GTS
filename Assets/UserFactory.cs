@@ -13,13 +13,11 @@ namespace Assets
             SceneObjects.UserModel.Health = 5;
             SceneObjects.UserModel.IsInvulnerable = true;
             SceneObjects.UserModel.InvulnerableTimer = 3;
+            SceneObjects.UserModel.MoneyAmount = PlayerPrefs.GetInt("MoneyAmount", 0);
 
             var healthText = UserInterfaceBehavior.HealthText.GetComponent<Text>();
             healthText.text = SceneObjects.UserModel.Health.ToString();
             healthText.enabled = true;
-            var invulnerableStatus = UserInterfaceBehavior.InvulnerableStatusText.GetComponent<Text>();
-            invulnerableStatus.text = SceneObjects.UserModel.IsInvulnerable ? "Invulnerable" : string.Empty;
-            invulnerableStatus.enabled = true;
         }
 
         public static GameObject CreateUser(string userName, float x, float z, bool isCurrentUser = false)
