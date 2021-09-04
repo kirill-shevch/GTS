@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets
 {
@@ -125,6 +126,7 @@ namespace Assets
         public static void GetMoney()
         {
             SceneObjects.UserModel.MoneyAmount++;
+            UserInterfaceBehavior.MoneyAmountText.GetComponent<Text>().text = SceneObjects.UserModel.MoneyAmount.ToString();
         }
 
         public static void ReceiveKDTable(Dictionary<string, KillDeathAmount> kDTable)

@@ -18,9 +18,6 @@ namespace Assets
             var healthText = UserInterfaceBehavior.HealthText.GetComponent<Text>();
             healthText.text = SceneObjects.UserModel.Health.ToString();
             healthText.enabled = true;
-            var invulnerableStatus = UserInterfaceBehavior.InvulnerableStatusText.GetComponent<Text>();
-            invulnerableStatus.text = SceneObjects.UserModel.IsInvulnerable ? "Invulnerable" : string.Empty;
-            invulnerableStatus.enabled = true;
         }
 
         public static GameObject CreateUser(string userName, float x, float z, bool isCurrentUser = false)

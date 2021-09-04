@@ -11,10 +11,11 @@ namespace Assets
         public static GameObject NameInput;
         public static GameObject UserNameText;
         public static GameObject HealthText;
-        public static GameObject InvulnerableStatusText;
         public static GameObject MessageText;
         public static GameObject MessageButton;
         public static GameObject UserNamePanel;
+        public static GameObject MoneyPanel;
+        public static GameObject MoneyAmountText;
 
         public static void Initialize()
         {
@@ -24,10 +25,11 @@ namespace Assets
             NameInput = GameObject.Find("NameField");
             UserNameText = GameObject.Find("UserName");
             HealthText = GameObject.Find("Health");
-            InvulnerableStatusText = GameObject.Find("InvulnerableStatus");
             MessageText = GameObject.Find("MessageText");
             MessageButton = GameObject.Find("MessageButton");
             UserNamePanel = GameObject.Find("UserNamePanel");
+            MoneyPanel = GameObject.Find("MoneyPanel");
+            MoneyAmountText = GameObject.Find("MoneyAmountText");
 
 
             LoginButton.GetComponentInChildren<Text>().text = "Ok";
@@ -39,8 +41,8 @@ namespace Assets
             var messageButton = MessageButton.GetComponent<Button>();
             var errorText = ErrorText.GetComponent<Text>();
             var healthText = HealthText.GetComponent<Text>();
+            var moneyAmountText = MoneyAmountText.GetComponent<Text>();
             var userNameText = UserNameText.GetComponent<Text>();
-            var invulnerableStatus = InvulnerableStatusText.GetComponent<Text>();
             var messageText = MessageText.GetComponent<Text>();
             loginButton.onClick.AddListener(OnLoginClick);
             errorButton.onClick.AddListener(OnErrorClick);
@@ -49,11 +51,11 @@ namespace Assets
             healthText.enabled = false;
             userNameText.enabled = false;
             messageText.enabled = false;
-            invulnerableStatus.enabled = false;
             ErrorButton.SetActive(false);
             MessageButton.SetActive(false);
             UserNamePanel.SetActive(false);
             nameInput.text = PlayerPrefs.GetString("UserName", string.Empty);
+            moneyAmountText.text = PlayerPrefs.GetInt("MoneyAmount", 0).ToString();
         }
 
         public static void ShowMessageText(string message)

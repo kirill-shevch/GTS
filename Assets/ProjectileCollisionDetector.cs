@@ -31,8 +31,6 @@ namespace Assets
                     {
                         SceneObjects.UserModel.InvulnerableTimer = 0.5f;
                         SceneObjects.UserModel.IsInvulnerable = true;
-                        var invulnerableStatus = UserInterfaceBehavior.InvulnerableStatusText.GetComponent<Text>();
-                        invulnerableStatus.text = "Invulnerable";
                     }
                     projectile.IsOver = true;
                     var healthText = UserInterfaceBehavior.HealthText.GetComponent<Text>();

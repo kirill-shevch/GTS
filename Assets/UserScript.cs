@@ -26,8 +26,6 @@ namespace Assets
                 if (SceneObjects.UserModel.InvulnerableTimer <= 0.0f && SceneObjects.UserModel.IsInvulnerable)
                 {
                     SceneObjects.UserModel.IsInvulnerable = false;
-                    var invulnerableStatus = GameObject.Find("InvulnerableStatus").GetComponent<Text>();
-                    invulnerableStatus.text = string.Empty;
                 }
             }
             if (SceneObjects.UserModel.IsOnCoolDown)
