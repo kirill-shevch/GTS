@@ -53,6 +53,7 @@ namespace Assets
             ErrorButton.SetActive(false);
             MessageButton.SetActive(false);
             UserNamePanel.SetActive(false);
+            nameInput.text = PlayerPrefs.GetString("UserName", string.Empty);
         }
 
         public static void ShowMessageText(string message)
@@ -103,6 +104,7 @@ namespace Assets
                 var userNameText = UserNameText.GetComponent<Text>();
                 userNameText.text = userName;
                 userNameText.enabled = true;
+                PlayerPrefs.SetString("UserName", userName);
             }
         }
 

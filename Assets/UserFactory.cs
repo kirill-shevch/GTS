@@ -13,6 +13,7 @@ namespace Assets
             SceneObjects.UserModel.Health = 5;
             SceneObjects.UserModel.IsInvulnerable = true;
             SceneObjects.UserModel.InvulnerableTimer = 3;
+            SceneObjects.UserModel.MoneyAmount = PlayerPrefs.GetInt("MoneyAmount", 0);
 
             var healthText = UserInterfaceBehavior.HealthText.GetComponent<Text>();
             healthText.text = SceneObjects.UserModel.Health.ToString();

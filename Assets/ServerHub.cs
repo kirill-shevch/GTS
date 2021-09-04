@@ -12,7 +12,7 @@ namespace Assets
         public static void Initialize()
         {
             Connection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:5000/userHub")
+                .WithUrl("http://lonelab.xyz/userHub")
                 .Build();
             Connection.StartAsync();
             Connection.On<ServerPlayer>("SendUser", x => ReceiveUser(x));
