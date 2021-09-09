@@ -9,6 +9,7 @@
         public Direction Direction { get; set; } = Direction.Top;
         public int Health { get; set; } = 5;
         public bool IsInvulnerable { get; set; } = true;
+        public ShipType Type { get; set; }
 
         public ClientPlayer ConverToClientPlayer()
         {
@@ -20,7 +21,8 @@
                 ConnectionId = ConnectionId,
                 Direction = Direction,
                 Health = Health,
-                IsInvulnerable = IsInvulnerable
+                IsInvulnerable = IsInvulnerable,
+                Type = Type
             };
         }
     }

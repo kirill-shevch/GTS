@@ -12,6 +12,7 @@
         public bool IsInvulnerable { get; set; } = true;
         public float InvulnerableTimer { get; set; } = 3;
         public int MoneyAmount { get; set; }
+        public ShipType Type { get; set; }
 
 
         public ServerPlayer ConvertToServerPlayer()
