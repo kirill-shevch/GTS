@@ -25,7 +25,8 @@
                 ConnectionId = ConnectionId,
                 Direction = Direction,
                 IsInvulnerable = IsInvulnerable,
-                Health = Health
+                Health = Health,
+                Type = Type
             };
         }
     }
