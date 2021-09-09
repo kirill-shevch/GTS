@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Models;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Assets
@@ -106,6 +107,7 @@ namespace Assets
             {
                 SceneObjects.UserModel.Name = userName;
                 SceneObjects.UserModel.ConnectionId = ServerHub.Connection.ConnectionId;
+                SceneObjects.UserModel.Type = GetShipType();
 
                 UserFactory.CreateCurrentUser();
 
@@ -121,6 +123,26 @@ namespace Assets
                 killDeathListText.enabled = true;
                 PlayerPrefs.SetString("UserName", userName);
             }
+        }
+
+        private static ShipType GetShipType()
+        {
+            var fighterToggle = GameObject.Find("FighterToggle").GetComponent<Toggle>();
+            var lincoreToggle = GameObject.Find("LincoreToggle").GetComponent<Toggle>();
+            var cruiserToggle = GameObject.Find("CruiserToggle").GetComponent<Toggle>();
+            if (fighterToggle.isOn)
+            {
+                return ShipType.Fighter;
+            }
+            if (lincoreToggle.isOn)
+            {
+                return ShipType.Lincore;
+            }            
+            if (cruiserToggle.isOn)
+            {
+                return ShipType.Cruiser;
+            }
+            return ShipType.Lincore;
         }
 
         private static void OnErrorClick()

@@ -153,9 +153,9 @@ namespace Assets
             Connection.StopAsync();
         }
 
-        public static void AddUserName(string userName)
+        public static void AddUserName(string userName, ShipType type)
         {
-            Connection.InvokeAsync("AddUserName", userName, Connection.ConnectionId);
+            Connection.InvokeAsync("AddUserName", userName, Connection.ConnectionId, type);
         }
     }
 }

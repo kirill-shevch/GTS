@@ -5182,7 +5182,7 @@ GameObject:
   - component: {fileID: 357726877}
   - component: {fileID: 357726876}
   m_Layer: 5
-  m_Name: LinerToggle
+  m_Name: LincoreToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17517,7 +17517,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Liner
+  m_Text: Lincore
 --- !u!222 &1027280879
 CanvasRenderer:
   m_ObjectHideFlags: 0

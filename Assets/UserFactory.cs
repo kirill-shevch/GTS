@@ -9,7 +9,7 @@ namespace Assets
         {
             SceneObjects.Player = UserFactory.CreateUser(SceneObjects.UserModel.Name, -10, -8, true);
             SceneObjects.Player.AddComponent<UserScript>();
-            ServerHub.AddUserName(SceneObjects.UserModel.Name);
+            ServerHub.AddUserName(SceneObjects.UserModel.Name, SceneObjects.UserModel.Type);
             SceneObjects.UserModel.Health = 5;
             SceneObjects.UserModel.IsInvulnerable = true;
             SceneObjects.UserModel.InvulnerableTimer = 3;
