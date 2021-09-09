@@ -1,4 +1,5 @@
 ﻿using Assets;
+using Assets.Models;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,16 +37,44 @@ public class Main : MonoBehaviour
             switch (scenePlayer.Value.Direction)
             {
                 case Assets.Models.Direction.Top:
-                    oldPlayer.transform.rotation = Quaternion.Euler(0, 0, 0);
+                    if (scenePlayer.Value.Type == ShipType.Cruiser)
+                    {
+                        oldPlayer.transform.rotation = Quaternion.Euler(-90, 0, -90);
+                    }
+                    else if (scenePlayer.Value.Type == ShipType.Fighter || scenePlayer.Value.Type == ShipType.Lincore)
+                    {
+                        oldPlayer.transform.rotation = Quaternion.Euler(-90, 0, 0);
+                    }
                     break;
                 case Assets.Models.Direction.Bot:
-                    oldPlayer.transform.rotation = Quaternion.Euler(0, 180, 0);
+                    if (scenePlayer.Value.Type == ShipType.Cruiser)
+                    {
+                        oldPlayer.transform.rotation = Quaternion.Euler(-90, 180, -90);
+                    }
+                    else if (scenePlayer.Value.Type == ShipType.Fighter || scenePlayer.Value.Type == ShipType.Lincore)
+                    {
+                        oldPlayer.transform.rotation = Quaternion.Euler(-90, 180, 0);
+                    }
                     break;
                 case Assets.Models.Direction.Left:
-                    oldPlayer.transform.rotation = Quaternion.Euler(0, 270, 0);
+                    if (scenePlayer.Value.Type == ShipType.Cruiser)
+                    {
+                        oldPlayer.transform.rotation = Quaternion.Euler(-90, 270, -90);
+                    }
+                    else if (scenePlayer.Value.Type == ShipType.Fighter || scenePlayer.Value.Type == ShipType.Lincore)
+                    {
+                        oldPlayer.transform.rotation = Quaternion.Euler(-90, 270, 0);
+                    }
                     break;
                 case Assets.Models.Direction.Right:
-                    oldPlayer.transform.rotation = Quaternion.Euler(0, 90, 0);
+                    if (scenePlayer.Value.Type == ShipType.Cruiser)
+                    {
+                        oldPlayer.transform.rotation = Quaternion.Euler(-90, 90, -90);
+                    }
+                    else if (scenePlayer.Value.Type == ShipType.Fighter || scenePlayer.Value.Type == ShipType.Lincore)
+                    {
+                        oldPlayer.transform.rotation = Quaternion.Euler(-90, 90, 0);
+                    }
                     break;
                 default:
                     break;

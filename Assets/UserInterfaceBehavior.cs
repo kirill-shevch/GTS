@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Models;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Assets
@@ -18,6 +19,7 @@ namespace Assets
         public static GameObject MoneyAmountText;        
         public static GameObject KillDeathPanel;
         public static GameObject KillDeathListText;
+        public static GameObject ShipPanel;
 
         public static void Initialize()
         {
@@ -34,6 +36,7 @@ namespace Assets
             MoneyAmountText = GameObject.Find("MoneyAmountText");
             KillDeathPanel = GameObject.Find("KillDeathPanel");
             KillDeathListText = GameObject.Find("KillDeathListText");
+            ShipPanel = GameObject.Find("ShipPanel");
 
 
             LoginButton.GetComponentInChildren<Text>().text = "Ok";
@@ -104,11 +107,13 @@ namespace Assets
             {
                 SceneObjects.UserModel.Name = userName;
                 SceneObjects.UserModel.ConnectionId = ServerHub.Connection.ConnectionId;
+                SceneObjects.UserModel.Type = GetShipType();
 
                 UserFactory.CreateCurrentUser();
 
                 LoginButton.SetActive(false);
                 NameInput.SetActive(false);
+                ShipPanel.SetActive(false);
                 UserNamePanel.SetActive(true);
                 KillDeathPanel.SetActive(true);
                 var killDeathListText = KillDeathListText.GetComponent<Text>();
@@ -118,6 +123,26 @@ namespace Assets
                 killDeathListText.enabled = true;
                 PlayerPrefs.SetString("UserName", userName);
             }
+        }
+
+        private static ShipType GetShipType()
+        {
+            var fighterToggle = GameObject.Find("FighterToggle").GetComponent<Toggle>();
+            var lincoreToggle = GameObject.Find("LincoreToggle").GetComponent<Toggle>();
+            var cruiserToggle = GameObject.Find("CruiserToggle").GetComponent<Toggle>();
+            if (fighterToggle.isOn)
+            {
+                return ShipType.Fighter;
+            }
+            if (lincoreToggle.isOn)
+            {
+                return ShipType.Lincore;
+            }            
+            if (cruiserToggle.isOn)
+            {
+                return ShipType.Cruiser;
+            }
+            return ShipType.Lincore;
         }
 
         private static void OnErrorClick()

@@ -35,7 +35,7 @@ namespace Assets
             else if (!SceneObjects.ScenePlayers.ContainsKey(player.Name))
             {
                 SceneObjects.ScenePlayers.Add(player.Name, player.ConverToClientPlayer());
-                UserFactory.CreateUser(player.Name, player.X, player.Z);
+                UserFactory.CreateUser(player.Name, player.X, player.Z, player.Type);
             }
             else
             {
@@ -153,9 +153,9 @@ namespace Assets
             Connection.StopAsync();
         }
 
-        public static void AddUserName(string userName)
+        public static void AddUserName(string userName, ShipType type)
         {
-            Connection.InvokeAsync("AddUserName", userName, Connection.ConnectionId);
+            Connection.InvokeAsync("AddUserName", userName, Connection.ConnectionId, type);
         }
     }
 }

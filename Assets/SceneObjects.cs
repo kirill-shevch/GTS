@@ -12,13 +12,21 @@ namespace Assets
         public static GameObject Player;
 
         public static Object ProjectileModel;
-        public static Object TankBlueModel;
-        public static Object TankRedModel;
+        public static Object FighterGreenModel;
+        public static Object FighterRedModel;        
+        public static Object LincoreGreenModel;
+        public static Object LincoreRedModel;        
+        public static Object CruiserGreenModel;
+        public static Object CruiserRedModel;
 
         public static void Initialize()
         {
-            TankBlueModel = Resources.Load("Cartoon_Tank_Free/CTF_Prefabs/TankFree_Blue");
-            TankRedModel = Resources.Load("Cartoon_Tank_Free/CTF_Prefabs/TankFree_Red");
+            FighterGreenModel = Resources.Load("PlayerModels/Fighter_Green");
+            FighterRedModel = Resources.Load("PlayerModels/Fighter_Red");
+            LincoreGreenModel = Resources.Load("PlayerModels/Lincore_Green");
+            LincoreRedModel = Resources.Load("PlayerModels/Lincore_Red");
+            CruiserGreenModel = Resources.Load("PlayerModels/Cruiser_Green");
+            CruiserRedModel = Resources.Load("PlayerModels/Cruiser_Red");
             ProjectileModel = Resources.Load("Cartoon_Tank_Free/CTF_Prefabs/СTF_Missile_Red");
         }
     }

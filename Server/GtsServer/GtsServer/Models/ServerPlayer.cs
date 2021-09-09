@@ -9,6 +9,7 @@
         public Direction Direction { get; set; } = Direction.Top;
         public int Health { get; set; } = 5;
         public bool IsInvulnerable { get; set; } = true;
+        public ShipType Type { get; set; }
 
         public void RegenerateCoordinates()
         {

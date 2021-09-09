@@ -14,14 +14,15 @@ namespace LoneLabWebApp.Services.Hubs
         {
         }
 
-        public async Task AddUserName(string userName, string connectionId)
+        public async Task AddUserName(string userName, string connectionId, ShipType type)
         {
             if (!_players.ContainsKey(userName))
             {
                 _players.Add(userName, new ServerPlayer
                 {
                     Name = userName,
-                    ConnectionId = connectionId
+                    ConnectionId = connectionId,
+                    Type = type
                 });
             }
             if (!_kdTable.ContainsKey(userName))

@@ -64,12 +64,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\CameraScript.cs" />
     <Compile Include="Assets\Main.cs" />
     <Compile Include="Assets\Models\ClientPlayer.cs" />
     <Compile Include="Assets\Models\DirectionEnum.cs" />
     <Compile Include="Assets\Models\KillDeathAmount.cs" />
     <Compile Include="Assets\Models\Projectile.cs" />
     <Compile Include="Assets\Models\ServerPlayer.cs" />
+    <Compile Include="Assets\Models\ShipType.cs" />
     <Compile Include="Assets\ProjectileCollisionDetector.cs" />
     <Compile Include="Assets\SceneObjects.cs" />
     <Compile Include="Assets\ServerHub.cs" />
