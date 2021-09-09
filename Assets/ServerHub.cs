@@ -35,7 +35,7 @@ namespace Assets
             else if (!SceneObjects.ScenePlayers.ContainsKey(player.Name))
             {
                 SceneObjects.ScenePlayers.Add(player.Name, player.ConverToClientPlayer());
-                UserFactory.CreateUser(player.Name, player.X, player.Z);
+                UserFactory.CreateUser(player.Name, player.X, player.Z, player.Type);
             }
             else
             {

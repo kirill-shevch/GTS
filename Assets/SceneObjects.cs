@@ -14,8 +14,8 @@ namespace Assets
         public static Object ProjectileModel;
         public static Object FighterGreenModel;
         public static Object FighterRedModel;        
-        public static Object LinerGreenModel;
-        public static Object LinerRedModel;        
+        public static Object LincoreGreenModel;
+        public static Object LincoreRedModel;        
         public static Object CruiserGreenModel;
         public static Object CruiserRedModel;
 
@@ -23,8 +23,8 @@ namespace Assets
         {
             FighterGreenModel = Resources.Load("PlayerModels/Fighter_Green");
             FighterRedModel = Resources.Load("PlayerModels/Fighter_Red");
-            LinerGreenModel = Resources.Load("PlayerModels/Liner_Green");
-            LinerRedModel = Resources.Load("PlayerModels/Liner_Red");
+            LincoreGreenModel = Resources.Load("PlayerModels/Lincore_Green");
+            LincoreRedModel = Resources.Load("PlayerModels/Lincore_Red");
             CruiserGreenModel = Resources.Load("PlayerModels/Cruiser_Green");
             CruiserRedModel = Resources.Load("PlayerModels/Cruiser_Red");
             ProjectileModel = Resources.Load("Cartoon_Tank_Free/CTF_Prefabs/СTF_Missile_Red");

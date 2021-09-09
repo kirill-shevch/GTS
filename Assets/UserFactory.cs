@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Models;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Assets
@@ -7,7 +8,7 @@ namespace Assets
     {
         public static void CreateCurrentUser()
         {
-            SceneObjects.Player = UserFactory.CreateUser(SceneObjects.UserModel.Name, -10, -8, true);
+            SceneObjects.Player = UserFactory.CreateUser(SceneObjects.UserModel.Name, -10, -8, SceneObjects.UserModel.Type, true);
             SceneObjects.Player.AddComponent<UserScript>();
             ServerHub.AddUserName(SceneObjects.UserModel.Name, SceneObjects.UserModel.Type);
             SceneObjects.UserModel.Health = 5;
@@ -20,9 +21,55 @@ namespace Assets
             healthText.enabled = true;
         }
 
-        public static GameObject CreateUser(string userName, float x, float z, bool isCurrentUser = false)
+        public static GameObject CreateUser(string userName, float x, float z, ShipType type, bool isCurrentUser = false)
         {
-            var player = (GameObject)(isCurrentUser ? GameObject.Instantiate(SceneObjects.LinerGreenModel) : GameObject.Instantiate(SceneObjects.LinerRedModel));
+            GameObject player = null;
+            if (isCurrentUser)
+            {
+                switch (type)
+                {
+                    case ShipType.Fighter:
+                        {
+                            player = (GameObject)GameObject.Instantiate(SceneObjects.FighterGreenModel);
+                            break;
+                        }
+                    case ShipType.Lincore:
+                        {
+                            player = (GameObject)GameObject.Instantiate(SceneObjects.LincoreGreenModel);
+                            break;
+                        }
+                    case ShipType.Cruiser:
+                        {
+                            player = (GameObject)GameObject.Instantiate(SceneObjects.CruiserGreenModel);
+                            break;
+                        }
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                switch (type)
+                {
+                    case ShipType.Fighter:
+                        {
+                            player = (GameObject)GameObject.Instantiate(SceneObjects.FighterRedModel);
+                            break;
+                        }
+                    case ShipType.Lincore:
+                        {
+                            player = (GameObject)GameObject.Instantiate(SceneObjects.LincoreRedModel);
+                            break;
+                        }
+                    case ShipType.Cruiser:
+                        {
+                            player = (GameObject)GameObject.Instantiate(SceneObjects.CruiserRedModel);
+                            break;
+                        }
+                    default:
+                        break;
+                }
+            }
             player.transform.position = new Vector3(x, 1, z);
             player.name = userName;
             var rigidbody = player.AddComponent<Rigidbody>();
