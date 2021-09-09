@@ -45,7 +45,14 @@ namespace Assets
                     SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
                     if (SceneObjects.UserModel.Direction != Direction.Right)
                     {
-                        SceneObjects.Player.transform.rotation = Quaternion.Euler(0, 90, 0);
+                        if (SceneObjects.UserModel.Type == ShipType.Cruiser)
+                        {
+                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 90, -90);
+                        }
+                        else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
+                        {
+                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 90, 0);
+                        }
                         SceneObjects.UserModel.Direction = Direction.Right;
                     }
                 }
@@ -55,7 +62,14 @@ namespace Assets
                     SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
                     if (SceneObjects.UserModel.Direction != Direction.Left)
                     {
-                        SceneObjects.Player.transform.rotation = Quaternion.Euler(0, 270, 0);
+                        if (SceneObjects.UserModel.Type == ShipType.Cruiser)
+                        {
+                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 270, -90);
+                        }
+                        else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
+                        {
+                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 270, 0);
+                        }
                         SceneObjects.UserModel.Direction = Direction.Left;
                     }
                 }
@@ -69,7 +83,14 @@ namespace Assets
                     SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
                     if (SceneObjects.UserModel.Direction != Direction.Top)
                     {
-                        SceneObjects.Player.transform.rotation = Quaternion.Euler(0, 0, 0);
+                        if (SceneObjects.UserModel.Type == ShipType.Cruiser)
+                        {
+                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 0, -90);
+                        }
+                        else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
+                        {
+                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 0, 0);
+                        }
                         SceneObjects.UserModel.Direction = Direction.Top;
                     }
                 }
@@ -79,7 +100,14 @@ namespace Assets
                     SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
                     if (SceneObjects.UserModel.Direction != Direction.Bot)
                     {
-                        SceneObjects.Player.transform.rotation = Quaternion.Euler(0, 180, 0);
+                        if (SceneObjects.UserModel.Type == ShipType.Cruiser)
+                        {
+                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 180, -90);
+                        }
+                        else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
+                        {
+                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 180, 0);
+                        }
                         SceneObjects.UserModel.Direction = Direction.Bot;
                     }
                 }
