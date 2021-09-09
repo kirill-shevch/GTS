@@ -22,7 +22,7 @@ namespace Assets
 
         public static GameObject CreateUser(string userName, float x, float z, bool isCurrentUser = false)
         {
-            var player = (GameObject)(isCurrentUser ? GameObject.Instantiate(SceneObjects.TankBlueModel) : GameObject.Instantiate(SceneObjects.TankRedModel));
+            var player = (GameObject)(isCurrentUser ? GameObject.Instantiate(SceneObjects.LinerGreenModel) : GameObject.Instantiate(SceneObjects.LinerRedModel));
             player.transform.position = new Vector3(x, 1, z);
             player.name = userName;
             var rigidbody = player.AddComponent<Rigidbody>();

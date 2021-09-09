@@ -18,6 +18,7 @@ namespace Assets
         public static GameObject MoneyAmountText;        
         public static GameObject KillDeathPanel;
         public static GameObject KillDeathListText;
+        public static GameObject ShipPanel;
 
         public static void Initialize()
         {
@@ -34,6 +35,7 @@ namespace Assets
             MoneyAmountText = GameObject.Find("MoneyAmountText");
             KillDeathPanel = GameObject.Find("KillDeathPanel");
             KillDeathListText = GameObject.Find("KillDeathListText");
+            ShipPanel = GameObject.Find("ShipPanel");
 
 
             LoginButton.GetComponentInChildren<Text>().text = "Ok";
@@ -109,6 +111,7 @@ namespace Assets
 
                 LoginButton.SetActive(false);
                 NameInput.SetActive(false);
+                ShipPanel.SetActive(false);
                 UserNamePanel.SetActive(true);
                 KillDeathPanel.SetActive(true);
                 var killDeathListText = KillDeathListText.GetComponent<Text>();
