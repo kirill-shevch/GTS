@@ -88,7 +88,7 @@ namespace LoneLabWebApp.Services.Hubs
             await Clients?.All.SendAsync("RemoveUser", playerName);
         }
 
-        public async Task CreateProjectile(float x, float z, Direction direction, string shooterName)
+        public async Task CreateProjectile(float x, float z, float direction, string shooterName)
         {
             await Clients?.All.SendAsync("Shoot", x, z, direction, shooterName);
         }
