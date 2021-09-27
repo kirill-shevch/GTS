@@ -1,5 +1,6 @@
 ﻿using Assets.Models;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Assets
@@ -36,82 +37,83 @@ namespace Assets
                     SceneObjects.UserModel.IsOnCoolDown = false;
                 }
             }
-            if (Input.GetButton("Horizontal"))
-            {
-                var horizontalInput = Input.GetAxis("Horizontal");
-                if (horizontalInput > 0)
-                {
-                    var targetPosition = SceneObjects.Player.transform.position + Vector3.right * movementSpeed;
-                    SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
-                    if (SceneObjects.UserModel.Direction != Direction.Right)
-                    {
-                        if (SceneObjects.UserModel.Type == ShipType.Cruiser)
-                        {
-                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 90, -90);
-                        }
-                        else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
-                        {
-                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 90, 0);
-                        }
-                        SceneObjects.UserModel.Direction = Direction.Right;
-                    }
-                }
-                else
-                {
-                    var targetPosition = SceneObjects.Player.transform.position + Vector3.left * movementSpeed;
-                    SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
-                    if (SceneObjects.UserModel.Direction != Direction.Left)
-                    {
-                        if (SceneObjects.UserModel.Type == ShipType.Cruiser)
-                        {
-                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 270, -90);
-                        }
-                        else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
-                        {
-                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 270, 0);
-                        }
-                        SceneObjects.UserModel.Direction = Direction.Left;
-                    }
-                }
-            }
-            else if (Input.GetButton("Vertical"))
-            {
-                var varticalInput = Input.GetAxis("Vertical");
-                if (varticalInput > 0)
-                {
-                    var targetPosition = SceneObjects.Player.transform.position + Vector3.forward * movementSpeed;
-                    SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
-                    if (SceneObjects.UserModel.Direction != Direction.Top)
-                    {
-                        if (SceneObjects.UserModel.Type == ShipType.Cruiser)
-                        {
-                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 0, -90);
-                        }
-                        else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
-                        {
-                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 0, 0);
-                        }
-                        SceneObjects.UserModel.Direction = Direction.Top;
-                    }
-                }
-                else
-                {
-                    var targetPosition = SceneObjects.Player.transform.position + Vector3.back * movementSpeed;
-                    SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
-                    if (SceneObjects.UserModel.Direction != Direction.Bot)
-                    {
-                        if (SceneObjects.UserModel.Type == ShipType.Cruiser)
-                        {
-                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 180, -90);
-                        }
-                        else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
-                        {
-                            SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 180, 0);
-                        }
-                        SceneObjects.UserModel.Direction = Direction.Bot;
-                    }
-                }
-            }
+            Move();
+            //if (Input.GetButton("Horizontal"))
+            //{
+            //    var horizontalInput = Input.GetAxis("Horizontal");
+            //    if (horizontalInput > 0)
+            //    {
+            //        var targetPosition = SceneObjects.Player.transform.position + Vector3.right * movementSpeed;
+            //        SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
+            //        if (SceneObjects.UserModel.Direction != Direction.Right)
+            //        {
+            //            if (SceneObjects.UserModel.Type == ShipType.Cruiser)
+            //            {
+            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 90, -90);
+            //            }
+            //            else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
+            //            {
+            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 90, 0);
+            //            }
+            //            SceneObjects.UserModel.Direction = Direction.Right;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        var targetPosition = SceneObjects.Player.transform.position + Vector3.left * movementSpeed;
+            //        SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
+            //        if (SceneObjects.UserModel.Direction != Direction.Left)
+            //        {
+            //            if (SceneObjects.UserModel.Type == ShipType.Cruiser)
+            //            {
+            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 270, -90);
+            //            }
+            //            else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
+            //            {
+            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 270, 0);
+            //            }
+            //            SceneObjects.UserModel.Direction = Direction.Left;
+            //        }
+            //    }
+            //}
+            //else if (Input.GetButton("Vertical"))
+            //{
+            //    var varticalInput = Input.GetAxis("Vertical");
+            //    if (varticalInput > 0)
+            //    {
+            //        var targetPosition = SceneObjects.Player.transform.position + Vector3.forward * movementSpeed;
+            //        SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
+            //        if (SceneObjects.UserModel.Direction != Direction.Top)
+            //        {
+            //            if (SceneObjects.UserModel.Type == ShipType.Cruiser)
+            //            {
+            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 0, -90);
+            //            }
+            //            else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
+            //            {
+            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 0, 0);
+            //            }
+            //            SceneObjects.UserModel.Direction = Direction.Top;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        var targetPosition = SceneObjects.Player.transform.position + Vector3.back * movementSpeed;
+            //        SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
+            //        if (SceneObjects.UserModel.Direction != Direction.Bot)
+            //        {
+            //            if (SceneObjects.UserModel.Type == ShipType.Cruiser)
+            //            {
+            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 180, -90);
+            //            }
+            //            else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
+            //            {
+            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 180, 0);
+            //            }
+            //            SceneObjects.UserModel.Direction = Direction.Bot;
+            //        }
+            //    }
+            //}
 
             if (Input.GetButton("Fire1") && !SceneObjects.UserModel.IsOnCoolDown)
             {
@@ -122,6 +124,26 @@ namespace Assets
                 fireCoolDownTime = 0.3f;
                 SceneObjects.UserModel.IsOnCoolDown = true;
             }
+        }
+
+        private void Move()
+        {
+            var move = GetComponent<PlayerInput>().actions["Move"].ReadValue<Vector2>();
+            var angle = transform.eulerAngles.y * Mathf.Deg2Rad;
+
+            Debug.Log($"{move.x}, {move.y}");
+            //Horizontal
+            var xcordHorizontal = Mathf.Cos(angle) * move.x;
+            var zcordHorizontal = -Mathf.Sin(angle) * move.x;
+            GetComponent<Rigidbody>().AddForce(new Vector3(xcordHorizontal, 0, zcordHorizontal) * 250 * Time.deltaTime);
+
+            //Vertical
+            var xcordVertical = Mathf.Sin(angle) * move.y;
+            var zcordVertical = Mathf.Cos(angle) * move.y;
+            GetComponent<Rigidbody>().AddForce(new Vector3(xcordVertical, 0, zcordVertical) * 500 * Time.deltaTime);
+
+            var look = GetComponent<PlayerInput>().actions["Rotate"].ReadValue<Vector2>();
+            transform.RotateAround(transform.position, Vector3.up, look.x * 30 * Time.deltaTime);
         }
 
         private void TimerEnded()

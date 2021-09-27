@@ -1,5 +1,6 @@
 ﻿using Assets.Models;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Assets
@@ -10,6 +11,11 @@ namespace Assets
         {
             SceneObjects.Player = UserFactory.CreateUser(SceneObjects.UserModel.Name, -10, -8, SceneObjects.UserModel.Type, true);
             SceneObjects.Player.AddComponent<UserScript>();
+            var playerInput = SceneObjects.Player.AddComponent<PlayerInput>();
+            playerInput.actions = Resources.Load<InputActionAsset>("JoystickControls");
+            playerInput.actions["Move"].Enable();
+            playerInput.actions["Rotate"].Enable();
+
             ServerHub.AddUserName(SceneObjects.UserModel.Name, SceneObjects.UserModel.Type);
             SceneObjects.UserModel.Health = 5;
             SceneObjects.UserModel.IsInvulnerable = true;
