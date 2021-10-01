@@ -21,7 +21,7 @@ namespace Assets
             Connection.StartAsync();
             Connection.On<ServerPlayer>("SendUser", x => ReceiveUser(x));
             Connection.On<string>("RemoveUser", x => RemoveUser(x));
-            Connection.On<float, float, Direction, string>("Shoot", (x, z, direction, shooterName) => Shoot(x, z, direction, shooterName));
+            Connection.On<float, float, float, string>("Shoot", (x, z, direction, shooterName) => Shoot(x, z, direction, shooterName));
             Connection.On("GetMoney", () => GetMoney());
             Connection.On<Dictionary<string, KillDeathAmount>>("BroadcastKDTable", kDTable => ReceiveKDTable(kDTable));
         }
@@ -54,7 +54,7 @@ namespace Assets
             GameObject.Destroy(player);
         }
 
-        public static void Shoot(float x, float z, Direction direction, string shooterName)
+        public static void Shoot(float x, float z, float direction, string shooterName)
         {
             var projectileGameObject = (GameObject)GameObject.Instantiate(SceneObjects.ProjectileModel);
             var rigidbody = projectileGameObject.AddComponent<Rigidbody>();
@@ -63,28 +63,9 @@ namespace Assets
                 RigidbodyConstraints.FreezeRotationY |
                 RigidbodyConstraints.FreezeRotationZ;
             var collider = projectileGameObject.AddComponent<BoxCollider>();
-            switch (direction)
-            {
-                case Direction.Top:
-                    z += 1.5f;
-                    projectileGameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
-                    break;
-                case Direction.Bot:
-                    z -= 1.5f;
-                    projectileGameObject.transform.rotation = Quaternion.Euler(0, 180, 0);
-                    break;
-                case Direction.Left:
-                    x -= 1.5f;
-                    projectileGameObject.transform.rotation = Quaternion.Euler(0, 270, 0);
-                    break;
-                case Direction.Right:
-                    x += 1.5f;
-                    projectileGameObject.transform.rotation = Quaternion.Euler(0, 90, 0);
-                    break;
-                default:
-                    break;
-            }
-            var position = new Vector3(x, 1, z);
+            projectileGameObject.transform.rotation = Quaternion.Euler(0, direction, 0);
+            var angle = direction * Mathf.Deg2Rad;
+            var position = new Vector3(x + (float)(Mathf.Sin(angle) * 1.5), 1, z + (float)(Mathf.Cos(angle) * 1.5));
             var uid = Guid.NewGuid().ToString();
             projectileGameObject.transform.position = position;
             projectileGameObject.tag = "Projectile";
@@ -101,13 +82,9 @@ namespace Assets
             });
         }
 
-        public static void CreateProjectile(float x, float z, Direction direction, string shooterName)
+        public static void CreateProjectile(float x, float z, float direction, string shooterName)
         {
-            Connection.InvokeAsync("CreateProjectile",
-                SceneObjects.UserModel.X,
-                SceneObjects.UserModel.Z,
-                SceneObjects.UserModel.Direction,
-                SceneObjects.UserModel.Name);
+            Connection.InvokeAsync("CreateProjectile", x, z, direction, shooterName);
         }
 
         public static void Synchronize(ServerPlayer player)

@@ -117,6 +117,7 @@ namespace Assets
 
             if (Input.GetButton("Fire1") && !SceneObjects.UserModel.IsOnCoolDown)
             {
+                Debug.Log(SceneObjects.UserModel.Direction);
                 ServerHub.CreateProjectile(SceneObjects.UserModel.X,
                     SceneObjects.UserModel.Z,
                     SceneObjects.UserModel.Direction,
@@ -131,7 +132,6 @@ namespace Assets
             var move = GetComponent<PlayerInput>().actions["Move"].ReadValue<Vector2>();
             var angle = transform.eulerAngles.y * Mathf.Deg2Rad;
 
-            Debug.Log($"{move.x}, {move.y}");
             //Horizontal
             var xcordHorizontal = Mathf.Cos(angle) * move.x;
             var zcordHorizontal = -Mathf.Sin(angle) * move.x;
@@ -144,6 +144,10 @@ namespace Assets
 
             var look = GetComponent<PlayerInput>().actions["Rotate"].ReadValue<Vector2>();
             transform.RotateAround(transform.position, Vector3.up, look.x * 30 * Time.deltaTime);
+
+            SceneObjects.UserModel.Direction = transform.eulerAngles.y;
+            SceneObjects.UserModel.X = transform.position.x;
+            SceneObjects.UserModel.Z = transform.position.z;
         }
 
         private void TimerEnded()
