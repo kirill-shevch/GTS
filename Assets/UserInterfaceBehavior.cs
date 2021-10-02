@@ -20,6 +20,10 @@ namespace Assets
         public static GameObject KillDeathPanel;
         public static GameObject KillDeathListText;
         public static GameObject ShipPanel;
+        public static GameObject LeftJoystick;
+        public static GameObject RightJoystick;
+        public static GameObject FireButton;
+        
 
         public static void Initialize()
         {
@@ -37,7 +41,9 @@ namespace Assets
             KillDeathPanel = GameObject.Find("KillDeathPanel");
             KillDeathListText = GameObject.Find("KillDeathListText");
             ShipPanel = GameObject.Find("ShipPanel");
-
+            LeftJoystick = GameObject.Find("MoveJoystick");
+            RightJoystick = GameObject.Find("RotationJoystick");
+            FireButton = GameObject.Find("FireButton");
 
             LoginButton.GetComponentInChildren<Text>().text = "Ok";
             var loginButton = LoginButton.GetComponent<Button>();
@@ -52,6 +58,8 @@ namespace Assets
             var userNameText = UserNameText.GetComponent<Text>();
             var messageText = MessageText.GetComponent<Text>();
             var killDeathListText = KillDeathListText.GetComponent<Text>();
+            var leftJoystickComponent = LeftJoystick.GetComponent<Image>();
+            var rightJoystickComponent = RightJoystick.GetComponent<Image>();
             loginButton.onClick.AddListener(OnLoginClick);
             errorButton.onClick.AddListener(OnErrorClick);
             messageButton.onClick.AddListener(OnMessageClick);
@@ -64,6 +72,9 @@ namespace Assets
             MessageButton.SetActive(false);
             UserNamePanel.SetActive(false);
             KillDeathPanel.SetActive(false);
+            leftJoystickComponent.enabled = false;
+            rightJoystickComponent.enabled = false;
+            FireButton.SetActive(false);
             nameInput.text = PlayerPrefs.GetString("UserName", string.Empty);
             moneyAmountText.text = PlayerPrefs.GetInt("MoneyAmount", 0).ToString();
         }
@@ -116,11 +127,16 @@ namespace Assets
                 ShipPanel.SetActive(false);
                 UserNamePanel.SetActive(true);
                 KillDeathPanel.SetActive(true);
+                FireButton.SetActive(true);
                 var killDeathListText = KillDeathListText.GetComponent<Text>();
                 var userNameText = UserNameText.GetComponent<Text>();
+                var leftJoystickComponent = LeftJoystick.GetComponent<Image>();
+                var rightJoystickComponent = RightJoystick.GetComponent<Image>();
                 userNameText.text = userName;
                 userNameText.enabled = true;
                 killDeathListText.enabled = true;
+                leftJoystickComponent.enabled = true;
+                rightJoystickComponent.enabled = true;
                 PlayerPrefs.SetString("UserName", userName);
             }
         }

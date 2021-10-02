@@ -11,6 +11,17 @@ namespace Assets
         private float synchronizationTime = 1.0f;
         private float fireCoolDownTime = 0.3f;
 
+        private InputAction moveAction;
+        private InputAction rotateAction;
+        private InputAction fireAction;
+
+        private void Start()
+        {
+            moveAction = GetComponent<PlayerInput>().actions["Move"];
+            rotateAction = GetComponent<PlayerInput>().actions["Rotate"];
+            fireAction = GetComponent<PlayerInput>().actions["Shoot"];
+        }
+
         private void Update()
         {
             var step = movementSpeed * Time.deltaTime;
@@ -38,86 +49,8 @@ namespace Assets
                 }
             }
             Move();
-            //if (Input.GetButton("Horizontal"))
-            //{
-            //    var horizontalInput = Input.GetAxis("Horizontal");
-            //    if (horizontalInput > 0)
-            //    {
-            //        var targetPosition = SceneObjects.Player.transform.position + Vector3.right * movementSpeed;
-            //        SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
-            //        if (SceneObjects.UserModel.Direction != Direction.Right)
-            //        {
-            //            if (SceneObjects.UserModel.Type == ShipType.Cruiser)
-            //            {
-            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 90, -90);
-            //            }
-            //            else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
-            //            {
-            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 90, 0);
-            //            }
-            //            SceneObjects.UserModel.Direction = Direction.Right;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        var targetPosition = SceneObjects.Player.transform.position + Vector3.left * movementSpeed;
-            //        SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
-            //        if (SceneObjects.UserModel.Direction != Direction.Left)
-            //        {
-            //            if (SceneObjects.UserModel.Type == ShipType.Cruiser)
-            //            {
-            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 270, -90);
-            //            }
-            //            else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
-            //            {
-            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 270, 0);
-            //            }
-            //            SceneObjects.UserModel.Direction = Direction.Left;
-            //        }
-            //    }
-            //}
-            //else if (Input.GetButton("Vertical"))
-            //{
-            //    var varticalInput = Input.GetAxis("Vertical");
-            //    if (varticalInput > 0)
-            //    {
-            //        var targetPosition = SceneObjects.Player.transform.position + Vector3.forward * movementSpeed;
-            //        SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
-            //        if (SceneObjects.UserModel.Direction != Direction.Top)
-            //        {
-            //            if (SceneObjects.UserModel.Type == ShipType.Cruiser)
-            //            {
-            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 0, -90);
-            //            }
-            //            else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
-            //            {
-            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 0, 0);
-            //            }
-            //            SceneObjects.UserModel.Direction = Direction.Top;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        var targetPosition = SceneObjects.Player.transform.position + Vector3.back * movementSpeed;
-            //        SceneObjects.Player.transform.position = Vector3.MoveTowards(SceneObjects.Player.transform.position, targetPosition, step);
-            //        if (SceneObjects.UserModel.Direction != Direction.Bot)
-            //        {
-            //            if (SceneObjects.UserModel.Type == ShipType.Cruiser)
-            //            {
-            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 180, -90);
-            //            }
-            //            else if (SceneObjects.UserModel.Type == ShipType.Fighter || SceneObjects.UserModel.Type == ShipType.Lincore)
-            //            {
-            //                SceneObjects.Player.transform.rotation = Quaternion.Euler(-90, 180, 0);
-            //            }
-            //            SceneObjects.UserModel.Direction = Direction.Bot;
-            //        }
-            //    }
-            //}
-
-            if (Input.GetButton("Fire1") && !SceneObjects.UserModel.IsOnCoolDown)
+            if ((fireAction.ReadValue<float>() == 1 || Input.GetButton("Fire1")) && !SceneObjects.UserModel.IsOnCoolDown)
             {
-                Debug.Log(SceneObjects.UserModel.Direction);
                 ServerHub.CreateProjectile(SceneObjects.UserModel.X,
                     SceneObjects.UserModel.Z,
                     SceneObjects.UserModel.Direction,
@@ -129,7 +62,7 @@ namespace Assets
 
         private void Move()
         {
-            var move = GetComponent<PlayerInput>().actions["Move"].ReadValue<Vector2>();
+            var move = moveAction.ReadValue<Vector2>();
             var angle = transform.eulerAngles.y * Mathf.Deg2Rad;
 
             //Horizontal
@@ -142,7 +75,7 @@ namespace Assets
             var zcordVertical = Mathf.Cos(angle) * move.y;
             GetComponent<Rigidbody>().AddForce(new Vector3(xcordVertical, 0, zcordVertical) * 500 * Time.deltaTime);
 
-            var look = GetComponent<PlayerInput>().actions["Rotate"].ReadValue<Vector2>();
+            var look = rotateAction.ReadValue<Vector2>();
             transform.RotateAround(transform.position, Vector3.up, look.x * 30 * Time.deltaTime);
 
             SceneObjects.UserModel.Direction = transform.eulerAngles.y;

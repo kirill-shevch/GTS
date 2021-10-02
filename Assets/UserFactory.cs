@@ -15,6 +15,7 @@ namespace Assets
             playerInput.actions = Resources.Load<InputActionAsset>("JoystickControls");
             playerInput.actions["Move"].Enable();
             playerInput.actions["Rotate"].Enable();
+            playerInput.actions["Shoot"].Enable();
 
             ServerHub.AddUserName(SceneObjects.UserModel.Name, SceneObjects.UserModel.Type);
             SceneObjects.UserModel.Health = 5;

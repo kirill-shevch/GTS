@@ -12,7 +12,6 @@ public class Main : MonoBehaviour
         ServerHub.Initialize();
         UserInterfaceBehavior.Initialize();
         SceneObjects.Initialize();
-        Screen.SetResolution(750, 600, false);
     }
 
     void Update()
